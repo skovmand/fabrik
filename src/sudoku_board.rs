@@ -27,7 +27,7 @@ impl TryFrom<String> for SudokuBoard {
 /// Get a String representation of a board
 impl Display for SudokuBoard {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "|---|---|---|")?;
+        writeln!(f, "+-----------+")?;
 
         for row in 0..=8 {
             write!(f, "|")?;
@@ -42,10 +42,12 @@ impl Display for SudokuBoard {
 
             writeln!(f)?;
 
-            if (row + 1) % 3 == 0 {
-                writeln!(f, "|---|---|---|")?;
+            if (row + 1) % 3 == 0 && row != 8 {
+                writeln!(f, "+---+---+---+")?;
             }
         }
+
+        writeln!(f, "+-----------+")?;
 
         Ok(())
     }
@@ -73,19 +75,19 @@ mod tests {
         let board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
 
         let expected_board = indoc! {"
-        |---|---|---|
+        +-----------+
         | 47|   |96 |
         |8  |716|  2|
         |6  |   |  8|
-        |---|---|---|
+        +---+---+---+
         |  2|1 8|5  |
         |   | 9 |   |
         |  1|6 2|3  |
-        |---|---|---|
+        +---+---+---+
         |5  |   |  1|
         |7  |945|  3|
         | 69|   |75 |
-        |---|---|---|
+        +-----------+
         "};
 
         assert_eq!(board.to_string(), expected_board);
