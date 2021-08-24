@@ -4,12 +4,13 @@ use std::{
 };
 
 /// A SudokuField is either a number 1-9 or a empty field
+#[derive(PartialEq, Eq, Debug)]
 pub enum SudokuField {
     Value(u8),
     Empty,
 }
 
-/// Try to parse a &u8 to a SudokuField
+/// Try to parse a an ASCII-encoded byte to a SudokuField
 impl TryFrom<&u8> for SudokuField {
     type Error = String;
 
@@ -29,5 +30,15 @@ impl Display for SudokuField {
             SudokuField::Empty => f.write_char(' '),
             SudokuField::Value(val) => f.write_str(&format!("{}", val)),
         }
+    }
+}
+
+impl SudokuField {
+    pub fn is_filled(&self) -> bool {
+        matches!(self, SudokuField::Value(_))
+    }
+
+    pub fn is_empty(&self) -> bool {
+        matches!(self, SudokuField::Empty)
     }
 }
