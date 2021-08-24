@@ -4,7 +4,7 @@ use std::{
 };
 
 /// A SudokuField is either a number 1-9 or a empty field
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub enum SudokuField {
     Value(u8),
     Empty,
