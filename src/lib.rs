@@ -1,5 +1,5 @@
-mod sudoku_board;
-mod sudoku_field;
+pub mod sudoku_board;
+pub mod sudoku_field;
 
 use sudoku_board::SudokuBoard;
 use sudoku_field::SudokuField;
