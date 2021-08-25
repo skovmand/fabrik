@@ -1,12 +1,31 @@
 use crate::sudoku_field::SudokuField;
 use std::{convert::TryFrom, fmt::Display};
 
+#[derive(Debug, PartialEq)]
+pub enum SudokuError {
+    InvalidLength,
+    InvalidCharacterInInput,
+    Unsolvable,
+}
+
+impl std::error::Error for SudokuError {}
+
+impl std::fmt::Display for SudokuError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            SudokuError::InvalidCharacterInInput => write!(f, "Invalid character in input"),
+            SudokuError::Unsolvable => write!(f, "The sudoku is unsolvable"),
+            SudokuError::InvalidLength => write!(f, "Input does not have length 81"),
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct SudokuBoard(Vec<SudokuField>);
 
 /// Read a String into a board
 impl TryFrom<String> for SudokuBoard {
-    type Error = String;
+    type Error = SudokuError;
 
     fn try_from(input: String) -> Result<Self, Self::Error> {
         let trimmed_input: Vec<SudokuField> = input
@@ -15,12 +34,12 @@ impl TryFrom<String> for SudokuBoard {
             .as_bytes()
             .iter()
             .map(SudokuField::try_from)
-            .collect::<Result<Vec<SudokuField>, String>>()?;
+            .collect::<Result<Vec<SudokuField>, SudokuError>>()?;
 
         if trimmed_input.len() == 81 {
             Ok(SudokuBoard(trimmed_input))
         } else {
-            Err("Input does not have length 81".into())
+            Err(SudokuError::InvalidLength)
         }
     }
 }
@@ -181,7 +200,8 @@ mod tests {
         let board = SudokuBoard::try_from(file_plus_one);
 
         assert!(board.is_err());
-        assert_eq!(board.err().unwrap(), "Input does not have length 81");
+
+        assert_eq!(board.err().unwrap(), SudokuError::InvalidLength);
     }
 
     #[test]
@@ -190,7 +210,8 @@ mod tests {
         let board = SudokuBoard::try_from(file_plus_one);
 
         assert!(board.is_err());
-        assert_eq!(board.err().unwrap(), "Invalid character 'A' in input");
+
+        assert_eq!(board.err().unwrap(), SudokuError::InvalidCharacterInInput);
     }
 
     #[test]

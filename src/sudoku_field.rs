@@ -3,6 +3,8 @@ use std::{
     fmt::{Display, Write},
 };
 
+use crate::sudoku_board::SudokuError;
+
 /// A SudokuField is either a number 1-9 or a empty field
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum SudokuField {
@@ -12,13 +14,13 @@ pub enum SudokuField {
 
 /// Try to parse a an ASCII-encoded byte to a SudokuField
 impl TryFrom<&u8> for SudokuField {
-    type Error = String;
+    type Error = SudokuError;
 
     fn try_from(value: &u8) -> Result<Self, Self::Error> {
         match value {
             b'-' => Ok(SudokuField::Empty),
             val if (49..=57).contains(val) => Ok(SudokuField::Value(val - 48)),
-            other => Err(format!("Invalid character '{}' in input", *other as char)),
+            _ => Err(SudokuError::InvalidCharacterInInput),
         }
     }
 }

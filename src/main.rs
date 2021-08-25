@@ -20,11 +20,10 @@ fn main() -> anyhow::Result<()> {
 
     // Since the INPUT arg is required, we use unwrap
     let filename = matches.value_of("INPUT").unwrap();
-    let sudoku_file = fs::read_to_string(filename).context("Failed to read input file")?;
 
-    // TODO: Don't unwrap!
-    let mut board = SudokuBoard::try_from(sudoku_file).unwrap();
-    solve_board(&mut board).unwrap();
+    let sudoku_file = fs::read_to_string(filename).context("Failed to read input file")?;
+    let mut board = SudokuBoard::try_from(sudoku_file).context("The sudoku file is invalid")?;
+    solve_board(&mut board).context("The sudoku could not be solved")?;
 
     println!("{}", board);
 

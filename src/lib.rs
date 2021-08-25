@@ -1,7 +1,7 @@
 pub mod sudoku_board;
 pub mod sudoku_field;
 
-use sudoku_board::SudokuBoard;
+use sudoku_board::{SudokuBoard, SudokuError};
 use sudoku_field::SudokuField;
 
 // Backtracking here is at once very advanced and also really simple!
@@ -10,7 +10,7 @@ use sudoku_field::SudokuField;
 // then placing the number in the field. After this we will recurse by calling
 // the same function once again, but below the recursion we will put back None
 // into the field, so if the program backtracks, it will restore the original state.
-pub fn solve_board(board: &mut SudokuBoard) -> Result<SudokuBoard, String> {
+pub fn solve_board(board: &mut SudokuBoard) -> Result<SudokuBoard, SudokuError> {
     match board.first_free_field() {
         // There are no more free fields. The board is solved!
         None => Ok(board.clone()),
@@ -29,7 +29,7 @@ pub fn solve_board(board: &mut SudokuBoard) -> Result<SudokuBoard, String> {
                 }
             }
 
-            Err("The board could not be solved".to_string())
+            Err(SudokuError::Unsolvable)
         }
     }
 }
@@ -95,7 +95,7 @@ mod tests {
         let result = solve_board(&mut board);
 
         assert!(result.is_err());
-        assert_eq!(result.err().unwrap(), "The board could not be solved");
+        assert_eq!(result.err().unwrap(), SudokuError::Unsolvable);
     }
 
     #[test]
