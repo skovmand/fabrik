@@ -41,7 +41,9 @@ mod tests {
     use super::*;
     use indoc::indoc;
 
-    const TEST_SUDOKU: &str = indoc! {"
+    #[test]
+    fn solves_board() {
+        const TEST_SUDOKU: &str = indoc! {"
             -47---96-
             8--716--2
             6-------8
@@ -51,13 +53,120 @@ mod tests {
             5-------1
             7--945--3
             -69---75-
-    "};
+        "};
 
-    #[test]
-    fn solves_board() {
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
         solve_board(&mut board).expect("Could not solve test board");
 
-        println!("{}", board);
+        let expected_solution = indoc! {"
+            +-----------+
+            |147|823|965|
+            |895|716|432|
+            |623|459|178|
+            +---+---+---+
+            |972|138|546|
+            |386|594|217|
+            |451|672|389|
+            +---+---+---+
+            |534|267|891|
+            |718|945|623|
+            |269|381|754|
+            +-----------+
+        "};
+
+        assert_eq!(board.to_string(), expected_solution);
+    }
+
+    #[test]
+    fn fails_on_invalid_board() {
+        const INVALID_SUDOKU: &str = indoc! {"
+            -47---96-
+            84-716--2
+            6-------8
+            --21-85--
+            ----9----
+            --16-23--
+            5-------1
+            7--945--3
+            -69---75-
+        "};
+
+        let mut board = SudokuBoard::try_from(INVALID_SUDOKU.to_owned()).unwrap();
+        let result = solve_board(&mut board);
+
+        assert!(result.is_err());
+        assert_eq!(result.err().unwrap(), "The board could not be solved");
+    }
+
+    #[test]
+    fn solves_blank_board() {
+        const BLANK_SUDOKU: &str = indoc! {"
+            ---------
+            ---------
+            ---------
+            ---------
+            ---------
+            ---------
+            ---------
+            ---------
+            ---------
+        "};
+
+        let mut board = SudokuBoard::try_from(BLANK_SUDOKU.to_owned()).unwrap();
+        solve_board(&mut board).expect("Could not solve test board");
+
+        let expected_solution = indoc! {"
+            +-----------+
+            |123|456|789|
+            |456|789|123|
+            |789|123|456|
+            +---+---+---+
+            |214|365|897|
+            |365|897|214|
+            |897|214|365|
+            +---+---+---+
+            |531|642|978|
+            |642|978|531|
+            |978|531|642|
+            +-----------+
+        "};
+
+        assert_eq!(board.to_string(), expected_solution);
+    }
+
+    #[test]
+    fn solves_hard_board() {
+        const HARD_SUDOKU: &str = indoc! {"
+                -3-----8-
+                5-------4
+                --42-81--
+                1-34-92-5
+                ---------
+                4-68-53-9
+                --17-35--
+                9-------1
+                -6-----7-
+        "};
+
+        let mut board = SudokuBoard::try_from(HARD_SUDOKU.to_owned()).unwrap();
+        solve_board(&mut board).expect("Could not solve test board");
+
+        let expected_solution = indoc! {"
+            +-----------+
+            |632|514|987|
+            |518|397|624|
+            |794|268|153|
+            +---+---+---+
+            |183|479|265|
+            |259|136|748|
+            |476|825|319|
+            +---+---+---+
+            |821|743|596|
+            |947|652|831|
+            |365|981|472|
+            +-----------+
+        "};
+
+        assert_eq!(board.to_string(), expected_solution);
     }
 }
