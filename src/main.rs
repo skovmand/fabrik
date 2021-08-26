@@ -1,10 +1,12 @@
 use std::{convert::TryFrom, fs};
 
-use anyhow::Context;
 use clap::{crate_version, App, AppSettings, Arg};
-use fabrik::{solve_board, sudoku_board::SudokuBoard};
+use fabrik::{
+    solve_board,
+    sudoku_board::{SudokuBoard, SudokuError},
+};
 
-fn main() -> anyhow::Result<()> {
+fn main() -> Result<(), SudokuError> {
     let matches = App::new("fabrik")
         .version(crate_version!())
         .author("https://github.com/skovmand/fabrik")
@@ -21,9 +23,9 @@ fn main() -> anyhow::Result<()> {
     // Since the INPUT arg is required, we use unwrap
     let filename = matches.value_of("INPUT").unwrap();
 
-    let sudoku_file = fs::read_to_string(filename).context("Failed to read input file")?;
-    let mut board = SudokuBoard::try_from(sudoku_file).context("The sudoku file is invalid")?;
-    solve_board(&mut board).context("The sudoku could not be solved")?;
+    let sudoku_file = fs::read_to_string(filename).map_err(|_| SudokuError::FileError)?;
+    let mut board = SudokuBoard::try_from(sudoku_file)?;
+    solve_board(&mut board)?;
 
     println!("{}", board);
 
