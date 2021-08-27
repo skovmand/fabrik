@@ -10,3 +10,8 @@ clap = "3.0.0-beta.4"
 
 [dev-dependencies]
 indoc = "1.0"
+criterion = "0.3"
+
+[[bench]]
+name = "benchmark"
+harness = false
