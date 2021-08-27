@@ -1,7 +1,9 @@
 pub mod sudoku_board;
+pub mod sudoku_error;
 pub mod sudoku_field;
 
-use sudoku_board::{SudokuBoard, SudokuError};
+use sudoku_board::SudokuBoard;
+use sudoku_error::SudokuError;
 use sudoku_field::SudokuField;
 
 // Backtracking here is at once very advanced and also really simple!

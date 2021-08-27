@@ -1,10 +1,9 @@
 use std::{convert::TryFrom, fs};
 
-use anyhow::Context;
 use clap::{crate_version, App, AppSettings, Arg};
-use fabrik::{solve_board, sudoku_board::SudokuBoard};
+use fabrik::{solve_board, sudoku_board::SudokuBoard, sudoku_error::SudokuError};
 
-fn main() -> anyhow::Result<()> {
+fn main() {
     let matches = App::new("fabrik")
         .version(crate_version!())
         .author("https://github.com/skovmand/fabrik")
@@ -21,20 +20,24 @@ fn main() -> anyhow::Result<()> {
     // Since the INPUT arg is required, we use unwrap
     let filename = matches.value_of("INPUT").unwrap();
 
-    let sudoku_file = fs::read_to_string(filename).context("Failed to read input file")?;
-    let mut board = SudokuBoard::try_from(sudoku_file).context("The sudoku file is invalid")?;
-    solve_board(&mut board).context("The sudoku could not be solved")?;
-
-    println!("{}", board);
-
-    Ok(())
+    match solve(filename) {
+        Ok(board) => {
+            print!("{}", board);
+            std::process::exit(0);
+        }
+        // Handle any error here, however it must implement std::error::Error,
+        // which means it implements the Display Trait, and therefore it can be printed as a string
+        Err(error) => {
+            println!("Error: {}", error);
+            std::process::exit(1);
+        }
+    }
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn can_calculate() {
-        let value = 4;
-        assert_eq!(value, 4);
-    }
+fn solve(filename: &str) -> Result<SudokuBoard, Box<dyn std::error::Error>> {
+    let sudoku_file = fs::read_to_string(filename).map_err(|_| SudokuError::FileError)?;
+    let mut board = SudokuBoard::try_from(sudoku_file)?;
+    solve_board(&mut board)?;
+
+    Ok(board)
 }

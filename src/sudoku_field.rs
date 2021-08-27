@@ -3,7 +3,7 @@ use std::{
     fmt::{Display, Write},
 };
 
-use crate::sudoku_board::SudokuError;
+use crate::sudoku_error::SudokuError;
 
 /// A SudokuField is either a number 1-9 or a empty field
 #[derive(PartialEq, Eq, Debug, Clone)]
