@@ -2,7 +2,7 @@
 
 ![Build Status](https://github.com/skovmand/fabrik/workflows/Fabrik%20CI/badge.svg)
 
-A Sudoku solver with backtracking written in Rust
+A Sudoku solver with backtracking written in Rust ❤️
 
 ## Setup
 
@@ -28,10 +28,23 @@ Put a sudoku in a file, with empty fields as `-` and `1-9` as field values. For 
 -6-----7-
 ```
 
-If the file is called `sudoku-1.txt`, solve it using `fabrik` like this:
+If the file is called `sudoku-1.txt`, solve it using `fabrik <filename>` like this:
 
 ```
 $ fabrik sudoku-1.txt
++-----------+
+|632|514|987|
+|518|397|624|
+|794|268|153|
++---+---+---+
+|183|479|265|
+|259|136|748|
+|476|825|319|
++---+---+---+
+|821|743|596|
+|947|652|831|
+|365|981|472|
++-----------+
 ```
 
 
