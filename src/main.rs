@@ -1,7 +1,7 @@
 use std::{convert::TryFrom, fs};
 
 use clap::{crate_version, App, AppSettings, Arg};
-use fabrik::{solve_board, sudoku_board::SudokuBoard, sudoku_error::SudokuError};
+use fabrik::{solve_board, sudoku_board::SudokuBoard};
 
 fn main() {
     let matches = App::new("fabrik")
@@ -35,7 +35,7 @@ fn main() {
 }
 
 fn solve(filename: &str) -> Result<SudokuBoard, Box<dyn std::error::Error>> {
-    let sudoku_file = fs::read_to_string(filename).map_err(|_| SudokuError::FileError)?;
+    let sudoku_file = fs::read_to_string(filename)?;
     let mut board = SudokuBoard::try_from(sudoku_file)?;
     solve_board(&mut board)?;
 
