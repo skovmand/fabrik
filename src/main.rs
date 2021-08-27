@@ -1,10 +1,7 @@
 use std::{convert::TryFrom, fs};
 
 use clap::{crate_version, App, AppSettings, Arg};
-use fabrik::{
-    solve_board,
-    sudoku_board::{SudokuBoard, SudokuError},
-};
+use fabrik::{solve_board, sudoku_board::SudokuBoard, sudoku_error::SudokuError};
 
 fn main() {
     let matches = App::new("fabrik")
