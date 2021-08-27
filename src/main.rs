@@ -25,6 +25,8 @@ fn main() {
             print!("{}", board);
             std::process::exit(0);
         }
+        // Handle any error here, however it must implement std::error::Error,
+        // which means it implements the Display Trait, and therefore it can be printed as a string
         Err(error) => {
             println!("Error: {}", error);
             std::process::exit(1);
@@ -32,7 +34,7 @@ fn main() {
     }
 }
 
-fn solve(filename: &str) -> Result<SudokuBoard, SudokuError> {
+fn solve(filename: &str) -> Result<SudokuBoard, Box<dyn std::error::Error>> {
     let sudoku_file = fs::read_to_string(filename).map_err(|_| SudokuError::FileError)?;
     let mut board = SudokuBoard::try_from(sudoku_file)?;
     solve_board(&mut board)?;
