@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
 use fabrik::{solve_board, sudoku_board::SudokuBoard};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
@@ -28,19 +28,25 @@ pub fn criterion_benchmark(c: &mut Criterion) {
                 ";
 
     c.bench_function("solve hard sudoku (1432-3)", |b| {
-        b.iter(|| {
-            let input = HARD_SUDOKU.to_owned();
-            let mut board = SudokuBoard::try_from(input).unwrap();
-            solve_board(&mut board).unwrap();
-        })
+        b.iter_batched(
+            || {
+                let input = HARD_SUDOKU.to_owned();
+                SudokuBoard::try_from(input).unwrap()
+            },
+            |mut board| solve_board(&mut board).unwrap(),
+            BatchSize::SmallInput,
+        )
     });
 
     c.bench_function("solve very hard sudoku (from ykw1)", |b| {
-        b.iter(|| {
-            let input = VERY_HARD_SUDOKU.to_owned();
-            let mut board = SudokuBoard::try_from(input).unwrap();
-            solve_board(&mut board).unwrap();
-        })
+        b.iter_batched(
+            || {
+                let input = VERY_HARD_SUDOKU.to_owned();
+                SudokuBoard::try_from(input).unwrap()
+            },
+            |mut board| solve_board(&mut board).unwrap(),
+            BatchSize::SmallInput,
+        )
     });
 }
 
