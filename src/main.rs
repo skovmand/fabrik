@@ -6,7 +6,7 @@ use fabrik::{
     sudoku_board::{SudokuBoard, SudokuError},
 };
 
-fn main() -> Result<(), SudokuError> {
+fn main() {
     let matches = App::new("fabrik")
         .version(crate_version!())
         .author("https://github.com/skovmand/fabrik")
@@ -23,20 +23,22 @@ fn main() -> Result<(), SudokuError> {
     // Since the INPUT arg is required, we use unwrap
     let filename = matches.value_of("INPUT").unwrap();
 
+    match solve(filename) {
+        Ok(board) => {
+            print!("{}", board);
+            std::process::exit(0);
+        }
+        Err(error) => {
+            println!("Error: {}", error);
+            std::process::exit(1);
+        }
+    }
+}
+
+fn solve(filename: &str) -> Result<SudokuBoard, SudokuError> {
     let sudoku_file = fs::read_to_string(filename).map_err(|_| SudokuError::FileError)?;
     let mut board = SudokuBoard::try_from(sudoku_file)?;
     solve_board(&mut board)?;
 
-    println!("{}", board);
-
-    Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn can_calculate() {
-        let value = 4;
-        assert_eq!(value, 4);
-    }
+    Ok(board)
 }
