@@ -33,7 +33,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
                 let input = HARD_SUDOKU.to_owned();
                 SudokuBoard::try_from(input).unwrap()
             },
-            |mut board| solve_board(&mut board).unwrap(),
+            |mut board| solve_board(&mut board, None::<&fn(&SudokuBoard) -> ()>).unwrap(),
             BatchSize::SmallInput,
         )
     });
@@ -44,7 +44,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
                 let input = VERY_HARD_SUDOKU.to_owned();
                 SudokuBoard::try_from(input).unwrap()
             },
-            |mut board| solve_board(&mut board).unwrap(),
+            |mut board| solve_board(&mut board, None::<&fn(&SudokuBoard)>).unwrap(),
             BatchSize::SmallInput,
         )
     });

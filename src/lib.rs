@@ -12,7 +12,15 @@ use sudoku_field::SudokuField;
 // then placing the number in the field. After this we will recurse by calling
 // the same function once again, but below the recursion we will put back None
 // into the field, so if the program backtracks, it will restore the original state.
-pub fn solve_board(board: &mut SudokuBoard) -> Result<SudokuBoard, SudokuError> {
+pub fn solve_board(
+    board: &mut SudokuBoard,
+    callback: Option<&impl Fn(&SudokuBoard)>
+) -> Result<SudokuBoard, SudokuError> {
+    // If there is a callback function, invoke it here
+    if let Some(callback_fn) = callback {
+        callback_fn(board)
+    };
+
     match board.first_free_field() {
         // There are no more free fields. The board is solved!
         None => Ok(board.clone()),
@@ -23,7 +31,7 @@ pub fn solve_board(board: &mut SudokuBoard) -> Result<SudokuBoard, SudokuError> 
                 if board.valid_number(row, column, num) {
                     board.put_field(row, column, SudokuField::Value(num));
 
-                    if let Ok(board) = solve_board(board) {
+                    if let Ok(board) = solve_board(board, callback) {
                         return Ok(board);
                     }
 
@@ -58,7 +66,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board).expect("Could not solve test board");
+        solve_board(&mut board, None::<&fn(&SudokuBoard)>).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -94,7 +102,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(INVALID_SUDOKU.to_owned()).unwrap();
-        let result = solve_board(&mut board);
+        let result = solve_board(&mut board, None::<&fn(&SudokuBoard)>);
 
         assert!(result.is_err());
         assert_eq!(result.err().unwrap(), SudokuError::Unsolvable);
@@ -115,7 +123,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(BLANK_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board).expect("Could not solve test board");
+        solve_board(&mut board, None::<&fn(&SudokuBoard)>).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -151,7 +159,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(HARD_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board).expect("Could not solve test board");
+        solve_board(&mut board, None::<&fn(&SudokuBoard)>).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
