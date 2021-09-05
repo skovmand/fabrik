@@ -14,7 +14,7 @@ use sudoku_field::SudokuField;
 // into the field, so if the program backtracks, it will restore the original state.
 pub fn solve_board(
     board: &mut SudokuBoard,
-    callback: Option<&impl Fn(&SudokuBoard)>
+    callback: Option<&dyn Fn(&SudokuBoard)>,
 ) -> Result<SudokuBoard, SudokuError> {
     // If there is a callback function, invoke it here
     if let Some(callback_fn) = callback {
@@ -66,7 +66,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, None::<&fn(&SudokuBoard)>).expect("Could not solve test board");
+        solve_board(&mut board, None).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -102,7 +102,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(INVALID_SUDOKU.to_owned()).unwrap();
-        let result = solve_board(&mut board, None::<&fn(&SudokuBoard)>);
+        let result = solve_board(&mut board, None);
 
         assert!(result.is_err());
         assert_eq!(result.err().unwrap(), SudokuError::Unsolvable);
@@ -123,7 +123,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(BLANK_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, None::<&fn(&SudokuBoard)>).expect("Could not solve test board");
+        solve_board(&mut board, None).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -159,7 +159,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(HARD_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, None::<&fn(&SudokuBoard)>).expect("Could not solve test board");
+        solve_board(&mut board, None).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
