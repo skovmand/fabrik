@@ -36,17 +36,9 @@ fn main() {
     // Get the values of cmd-line args
     let filename = matches.value_of("INPUT").unwrap();
     let display_mode: bool = matches.is_present("display");
-    let delay: u64 = matches
-        .value_of("delay")
-        .map_or(50, |x| x.parse().expect("Could not parse delay value"));
+    let delay = matches.value_of("delay");
 
-    let return_code = match {
-        if display_mode {
-            solve_in_display_mode(filename, delay)
-        } else {
-            solve_in_standard_mode(filename)
-        }
-    } {
+    let return_code = match solve_dispatch(filename, display_mode, delay) {
         Ok(_board) => 0,
         Err(error) => {
             println!("Error: {}", error);
@@ -57,10 +49,24 @@ fn main() {
     std::process::exit(return_code);
 }
 
-fn solve_in_display_mode(
+fn solve_dispatch(
     filename: &str,
-    delay: u64,
-) -> Result<SudokuBoard, Box<dyn std::error::Error>> {
+    display_mode_enabled: bool,
+    delay: Option<&str>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    if display_mode_enabled {
+        let delay = match delay {
+            None => Ok(50),
+            Some(value) => value.parse(),
+        }?;
+
+        solve_in_display_mode(filename, delay)
+    } else {
+        solve_in_standard_mode(filename)
+    }
+}
+
+fn solve_in_display_mode(filename: &str, delay: u64) -> Result<(), Box<dyn std::error::Error>> {
     let sleep_time = time::Duration::from_millis(delay);
     let callback_fn = make_print_sudoku_callback(sleep_time);
 
@@ -69,13 +75,17 @@ fn solve_in_display_mode(
     cursor_at_position(1, 1);
     println!("Solving {} with {}ms step delay", filename, delay);
 
-    let result = solve(filename, Some(&callback_fn));
+    solve(filename, Some(&callback_fn))?;
     show_cursor();
-    result
+
+    Ok(())
 }
 
-fn solve_in_standard_mode(filename: &str) -> Result<SudokuBoard, Box<dyn std::error::Error>> {
-    solve(filename, None)
+fn solve_in_standard_mode(filename: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let board = solve(filename, None)?;
+
+    print!("{}", board);
+    Ok(())
 }
 
 // Helper function to print the sudoku to screen and wait a given interval
