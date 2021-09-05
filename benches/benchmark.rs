@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
-use fabrik::{renderers::NonRenderer, solve_board, sudoku_board::SudokuBoard};
+use fabrik::{renderers::NonRenderer, solve_board, sudoku::SudokuBoard};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     const HARD_SUDOKU: &str = "

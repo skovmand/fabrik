@@ -1,4 +1,4 @@
-use fabrik::{renderers::SudokuRenderer, sudoku_board::SudokuBoard};
+use fabrik::{renderers::SudokuRenderer, sudoku::SudokuBoard};
 use std::{thread, time};
 
 use crate::terminal_renderers::ansi::*;

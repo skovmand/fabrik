@@ -1,5 +1,5 @@
 use super::SudokuRenderer;
-use crate::sudoku_board::SudokuBoard;
+use crate::sudoku::SudokuBoard;
 
 pub struct NonRenderer {}
 

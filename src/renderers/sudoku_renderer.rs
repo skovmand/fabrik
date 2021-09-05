@@ -1,4 +1,4 @@
-use crate::sudoku_board::SudokuBoard;
+use crate::sudoku::SudokuBoard;
 
 pub trait SudokuRenderer {
     fn setup(&self, filename: &str);

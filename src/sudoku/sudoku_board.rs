@@ -1,5 +1,6 @@
-use crate::{sudoku_error::SudokuError, sudoku_field::SudokuField};
 use std::{convert::TryFrom, fmt::Display};
+
+use super::{SudokuError, SudokuField};
 
 #[derive(Clone)]
 pub struct SudokuBoard(Vec<SudokuField>);

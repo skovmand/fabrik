@@ -1,12 +1,8 @@
 pub mod renderers;
-pub mod sudoku_board;
-pub mod sudoku_error;
-pub mod sudoku_field;
+pub mod sudoku;
 
 use renderers::SudokuRenderer;
-use sudoku_board::SudokuBoard;
-use sudoku_error::SudokuError;
-use sudoku_field::SudokuField;
+use sudoku::{SudokuBoard, SudokuError, SudokuField};
 
 // Backtracking here is at once very advanced and also really simple!
 // For every iteration we are finding the first empty field on the board,
