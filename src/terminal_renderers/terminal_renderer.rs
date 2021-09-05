@@ -3,7 +3,9 @@ use fabrik::{renderers::SudokuRenderer, sudoku::SudokuBoard};
 pub struct TerminalRenderer {}
 
 impl SudokuRenderer for TerminalRenderer {
-    fn setup(&self, _filename: &str) {}
+    fn setup(&self, filename: &str) {
+        println!("{}", filename);
+    }
 
     fn display_step(&self, _board: &SudokuBoard) {}
 

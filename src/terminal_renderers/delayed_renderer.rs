@@ -22,7 +22,8 @@ impl SudokuRenderer for DelayedRenderer {
         thread::sleep(SLEEP_TIME);
     }
 
-    // Since the delayed renderer will end up with a solved sudoku
+    // Since the delayed renderer will end up with a solved sudoku using display_step, 
+    // we will not display the final result
     fn display_final_result(&self, _board: &SudokuBoard) {}
 
     fn teardown(&self) {
