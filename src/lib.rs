@@ -1,7 +1,9 @@
+pub mod renderers;
 pub mod sudoku_board;
 pub mod sudoku_error;
 pub mod sudoku_field;
 
+use renderers::SudokuRenderer;
 use sudoku_board::SudokuBoard;
 use sudoku_error::SudokuError;
 use sudoku_field::SudokuField;
@@ -14,12 +16,10 @@ use sudoku_field::SudokuField;
 // into the field, so if the program backtracks, it will restore the original state.
 pub fn solve_board(
     board: &mut SudokuBoard,
-    callback: Option<&dyn Fn(&SudokuBoard)>,
+    renderer: &dyn SudokuRenderer,
 ) -> Result<SudokuBoard, SudokuError> {
-    // If there is a callback function, invoke it here
-    if let Some(callback_fn) = callback {
-        callback_fn(board)
-    };
+    // Render the current board
+    renderer.display_step(board);
 
     match board.first_free_field() {
         // There are no more free fields. The board is solved!
@@ -31,7 +31,7 @@ pub fn solve_board(
                 if board.valid_number(row, column, num) {
                     board.put_field(row, column, SudokuField::Value(num));
 
-                    if let Ok(board) = solve_board(board, callback) {
+                    if let Ok(board) = solve_board(board, renderer) {
                         return Ok(board);
                     }
 
@@ -47,6 +47,8 @@ pub fn solve_board(
 #[cfg(test)]
 mod tests {
     use std::convert::TryFrom;
+
+    use crate::renderers::NonRenderer;
 
     use super::*;
     use indoc::indoc;
@@ -66,7 +68,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, None).expect("Could not solve test board");
+        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -102,7 +104,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(INVALID_SUDOKU.to_owned()).unwrap();
-        let result = solve_board(&mut board, None);
+        let result = solve_board(&mut board, &NonRenderer {});
 
         assert!(result.is_err());
         assert_eq!(result.err().unwrap(), SudokuError::Unsolvable);
@@ -123,7 +125,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(BLANK_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, None).expect("Could not solve test board");
+        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -159,7 +161,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(HARD_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, None).expect("Could not solve test board");
+        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
