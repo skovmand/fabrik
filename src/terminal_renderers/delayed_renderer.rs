@@ -1,6 +1,7 @@
-use crate::ansi::*;
 use fabrik::{renderers::SudokuRenderer, sudoku_board::SudokuBoard};
 use std::{thread, time};
+
+use crate::terminal_renderers::ansi::*;
 
 const SLEEP_TIME: time::Duration = time::Duration::from_millis(50);
 

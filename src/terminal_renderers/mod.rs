@@ -1,3 +1,4 @@
+mod ansi;
 mod delayed_renderer;
 mod terminal_renderer;
 

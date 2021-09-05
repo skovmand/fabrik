@@ -1,10 +1,8 @@
-mod ansi;
 mod terminal_renderers;
-
-use std::{convert::TryFrom, fs};
 
 use clap::{crate_version, App, AppSettings, Arg};
 use fabrik::{renderers::SudokuRenderer, solve_board, sudoku_board::SudokuBoard};
+use std::{convert::TryFrom, fs};
 
 use crate::terminal_renderers::{DelayedRenderer, TerminalRenderer};
 
