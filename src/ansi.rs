@@ -14,4 +14,3 @@ pub fn hide_cursor() {
 pub fn show_cursor() {
     print!("{}[?25h", 27 as char);
 }
-
