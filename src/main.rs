@@ -38,15 +38,15 @@ fn main() {
     let display_mode: bool = matches.is_present("display");
     let delay = matches.value_of("delay");
 
-    let return_code = match solve_dispatch(filename, display_mode, delay) {
-        Ok(_board) => 0,
+    match solve_dispatch(filename, display_mode, delay) {
+        Ok(_board) => {
+            std::process::exit(0);
+        }
         Err(error) => {
             println!("Error: {}", error);
-            1
+            std::process::exit(1);
         }
     };
-
-    std::process::exit(return_code);
 }
 
 fn solve_dispatch(
