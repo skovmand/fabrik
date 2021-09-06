@@ -1,13 +1,22 @@
-use std::{convert::TryFrom, fs};
+mod terminal_renderers;
 
 use clap::{crate_version, App, AppSettings, Arg};
-use fabrik::{solve_board, sudoku_board::SudokuBoard};
+use fabrik::{renderers::SudokuRenderer, solve_board, sudoku::SudokuBoard};
+use std::{convert::TryFrom, fs};
+
+use crate::terminal_renderers::{DelayedRenderer, TerminalRenderer};
 
 fn main() {
     let matches = App::new("fabrik")
         .version(crate_version!())
         .author("https://github.com/skovmand/fabrik")
         .about("Brute force sudoku solver using backtracking")
+        .arg(
+            Arg::new("display")
+                .long("display")
+                .short('d')
+                .about("Solve the sudoku in display mode"),
+        )
         .setting(AppSettings::ArgRequiredElseHelp)
         .arg(
             Arg::new("INPUT")
@@ -17,27 +26,38 @@ fn main() {
         )
         .get_matches();
 
-    // Since the INPUT arg is required, we use unwrap
     let filename = matches.value_of("INPUT").unwrap();
+    let renderer: &dyn SudokuRenderer = if matches.is_present("display") {
+        &DelayedRenderer {}
+    } else {
+        &TerminalRenderer {}
+    };
 
-    match solve(filename) {
+    // Set up renderer
+    renderer.setup(filename);
+
+    match solve(filename, renderer) {
         Ok(board) => {
-            print!("{}", board);
+            renderer.display_final_result(&board);
+            renderer.teardown();
             std::process::exit(0);
         }
-        // Handle any error here, however it must implement std::error::Error,
-        // which means it implements the Display Trait, and therefore it can be printed as a string
         Err(error) => {
             println!("Error: {}", error);
+            renderer.teardown();
             std::process::exit(1);
         }
-    }
+    };
 }
 
-fn solve(filename: &str) -> Result<SudokuBoard, Box<dyn std::error::Error>> {
+// Solve the sudoku given an optional callback
+fn solve(
+    filename: &str,
+    renderer: &dyn SudokuRenderer,
+) -> Result<SudokuBoard, Box<dyn std::error::Error>> {
     let sudoku_file = fs::read_to_string(filename)?;
     let mut board = SudokuBoard::try_from(sudoku_file)?;
-    solve_board(&mut board)?;
+    solve_board(&mut board, renderer)?;
 
     Ok(board)
 }

@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
-use fabrik::{solve_board, sudoku_board::SudokuBoard};
+use fabrik::{renderers::NonRenderer, solve_board, sudoku::SudokuBoard};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     const HARD_SUDOKU: &str = "
@@ -33,7 +33,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
                 let input = HARD_SUDOKU.to_owned();
                 SudokuBoard::try_from(input).unwrap()
             },
-            |mut board| solve_board(&mut board).unwrap(),
+            |mut board| solve_board(&mut board, &NonRenderer {}).unwrap(),
             BatchSize::SmallInput,
         )
     });
@@ -44,7 +44,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
                 let input = VERY_HARD_SUDOKU.to_owned();
                 SudokuBoard::try_from(input).unwrap()
             },
-            |mut board| solve_board(&mut board).unwrap(),
+            |mut board| solve_board(&mut board, &NonRenderer {}).unwrap(),
             BatchSize::SmallInput,
         )
     });
