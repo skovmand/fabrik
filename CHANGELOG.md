@@ -1,3 +1,7 @@
+## 0.6.0 - Visualizing solutions
+
+* Visualize sudoku solving when using the --display or -d flag
+
 ## 0.5.2 - Benchmarks and polishing
 
 * Add benchmark suite using criterion
