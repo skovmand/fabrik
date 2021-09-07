@@ -31,7 +31,13 @@ Put a sudoku in a file, with empty fields as `-` and `1-9` as field values. For 
 If the file is called `sudoku-1.txt`, solve it using `fabrik <filename>`. If you pass the `--display` or `-d` flag, the sudoku will be solved with a delay after each step. This is great for learning how backtracking works.
 
 ```
-# use --display as flag if you want to see the solving step by step
+# Solve a sudoku in display mode
+$ fabrik sudoku-1.txt --display
+
+# Solve a sudoku in display with custom delay (1ms per step)
+$ fabrik sudoku-1.txt --display --delay 1
+
+# Solve a sudoku and display the final result
 $ fabrik sudoku-1.txt
 +-----------+
 |632|514|987|

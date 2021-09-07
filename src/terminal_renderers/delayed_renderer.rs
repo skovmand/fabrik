@@ -1,25 +1,25 @@
 use fabrik::{renderers::SudokuRenderer, sudoku::SudokuBoard};
-use std::{thread, time};
+use std::{thread, time::Duration};
 
 use crate::terminal_renderers::ansi::*;
 
-const SLEEP_TIME: time::Duration = time::Duration::from_millis(50);
-
-pub struct DelayedRenderer {}
+pub struct DelayedRenderer {
+    pub delay: Duration,
+}
 
 impl SudokuRenderer for DelayedRenderer {
     fn setup(&self, filename: &str) {
         clear_screen();
         hide_cursor();
         cursor_at_position(1, 1);
-        println!("Solving {} with 50ms step delay", filename);
+        println!("Solving {} with {:?} step delay", filename, self.delay);
     }
 
     // Display the result after a single step
     fn display_step(&self, board: &SudokuBoard) {
         cursor_at_position(3, 1);
         print!("{}", board);
-        thread::sleep(SLEEP_TIME);
+        thread::sleep(self.delay);
     }
 
     // Since the delayed renderer will end up with a solved sudoku using display_step,
