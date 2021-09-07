@@ -4,6 +4,9 @@
 
 A Sudoku solver with backtracking written in Rust ❤️
 
+[![asciicast](https://asciinema.org/a/433999.svg)](https://asciinema.org/a/433999)
+
+
 ## Setup
 
 1. [Install Rust](https://www.rust-lang.org/tools/install)
