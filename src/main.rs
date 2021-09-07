@@ -1,10 +1,9 @@
 mod terminal_renderers;
 
+use crate::terminal_renderers::{DelayedRenderer, Renderer, TerminalRenderer};
 use clap::{crate_version, App, AppSettings, Arg};
 use fabrik::{renderers::SudokuRenderer, solve_board, sudoku::SudokuBoard};
-use std::{convert::TryFrom, fs};
-
-use crate::terminal_renderers::{DelayedRenderer, Renderer, TerminalRenderer};
+use std::{convert::TryFrom, fs, time::Duration};
 
 fn main() {
     let matches = App::new("fabrik")
@@ -16,6 +15,12 @@ fn main() {
                 .long("display")
                 .short('d')
                 .about("Solve the sudoku in display mode"),
+        )
+        .arg(
+            Arg::new("delay")
+                .long("delay")
+                .takes_value(true)
+                .about("Set the delay in ms used in display mode (defaults to 50ms)"),
         )
         .setting(AppSettings::ArgRequiredElseHelp)
         .arg(
@@ -29,7 +34,13 @@ fn main() {
     let filename = matches.value_of("INPUT").unwrap();
 
     let renderer: Renderer = if matches.is_present("display") {
-        Renderer::Delayed(DelayedRenderer {})
+        let delay = matches
+            .value_of("delay")
+            .map_or(50, |x| x.parse().unwrap_or(50));
+
+        let delay = Duration::from_millis(delay);
+
+        Renderer::Delayed(DelayedRenderer { delay })
     } else {
         Renderer::FinalResultOnly(TerminalRenderer {})
     };
