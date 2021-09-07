@@ -4,7 +4,7 @@
 
 A Sudoku solver with backtracking written in Rust ❤️
 
-[![asciicast](https://asciinema.org/a/433999.svg)](https://asciinema.org/a/433999)
+[![asciicast](https://asciinema.org/a/434516.svg)](https://asciinema.org/a/434516)
 
 
 ## Setup
