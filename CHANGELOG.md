@@ -1,3 +1,8 @@
+## 0.6.1 - Delay flag + internal refactors
+
+* Use --delay flag for custom render speed in display mode
+* Internal refactors: Use generics instead of dynamic dispatch
+
 ## 0.6.0 - Visualizing solutions
 
 * Visualize sudoku solving when using the --display or -d flag
