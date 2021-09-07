@@ -10,9 +10,9 @@ use sudoku::{SudokuBoard, SudokuError, SudokuField};
 // then placing the number in the field. After this we will recurse by calling
 // the same function once again, but below the recursion we will put back None
 // into the field, so if the program backtracks, it will restore the original state.
-pub fn solve_board(
+pub fn solve_board<T: SudokuRenderer>(
     board: &mut SudokuBoard,
-    renderer: &dyn SudokuRenderer,
+    renderer: &T,
 ) -> Result<SudokuBoard, SudokuError> {
     // Render the current board
     renderer.display_step(board);
