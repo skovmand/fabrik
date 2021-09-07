@@ -4,7 +4,7 @@ use clap::{crate_version, App, AppSettings, Arg};
 use fabrik::{renderers::SudokuRenderer, solve_board, sudoku::SudokuBoard};
 use std::{convert::TryFrom, fs};
 
-use crate::terminal_renderers::{DelayedRenderer, TerminalRenderer};
+use crate::terminal_renderers::{DelayedRenderer, Renderer, TerminalRenderer};
 
 fn main() {
     let matches = App::new("fabrik")
@@ -27,16 +27,17 @@ fn main() {
         .get_matches();
 
     let filename = matches.value_of("INPUT").unwrap();
-    let renderer: &dyn SudokuRenderer = if matches.is_present("display") {
-        &DelayedRenderer {}
+
+    let renderer: Renderer = if matches.is_present("display") {
+        Renderer::Delayed(DelayedRenderer {})
     } else {
-        &TerminalRenderer {}
+        Renderer::FinalResultOnly(TerminalRenderer {})
     };
 
     // Set up renderer
     renderer.setup(filename);
 
-    match solve(filename, renderer) {
+    match solve(filename, &renderer) {
         Ok(board) => {
             renderer.display_final_result(&board);
             renderer.teardown();
@@ -51,9 +52,9 @@ fn main() {
 }
 
 // Solve the sudoku given an optional callback
-fn solve(
+fn solve<T: SudokuRenderer>(
     filename: &str,
-    renderer: &dyn SudokuRenderer,
+    renderer: &T,
 ) -> Result<SudokuBoard, Box<dyn std::error::Error>> {
     let sudoku_file = fs::read_to_string(filename)?;
     let mut board = SudokuBoard::try_from(sudoku_file)?;
