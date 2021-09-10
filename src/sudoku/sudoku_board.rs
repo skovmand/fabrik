@@ -1,9 +1,12 @@
-use std::{convert::TryFrom, fmt::Display};
+use std::{
+    convert::{TryFrom, TryInto},
+    fmt::Display,
+};
 
 use super::{SudokuError, SudokuField};
 
 #[derive(Clone)]
-pub struct SudokuBoard(Vec<SudokuField>);
+pub struct SudokuBoard([SudokuField; 81]);
 
 /// Read a String into a board
 impl TryFrom<String> for SudokuBoard {
@@ -18,11 +21,11 @@ impl TryFrom<String> for SudokuBoard {
             .map(SudokuField::try_from)
             .collect::<Result<Vec<SudokuField>, SudokuError>>()?;
 
-        if trimmed_input.len() == 81 {
-            Ok(SudokuBoard(trimmed_input))
-        } else {
-            Err(SudokuError::InvalidLength)
-        }
+        let board_as_array: [SudokuField; 81] = trimmed_input
+            .try_into()
+            .map_err(|_| SudokuError::InvalidLength)?;
+
+        Ok(SudokuBoard(board_as_array))
     }
 }
 
