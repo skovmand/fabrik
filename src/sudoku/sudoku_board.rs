@@ -1,29 +1,29 @@
-use std::{
-    convert::{TryFrom, TryInto},
-    fmt::Display,
-};
+use std::{convert::TryFrom, fmt::Display};
 
 use super::{SudokuError, SudokuField};
 
 #[derive(Clone)]
-pub struct SudokuBoard([SudokuField; 81]);
+pub struct SudokuBoard([[SudokuField; 9]; 9]);
 
 /// Read a String into a board
 impl TryFrom<String> for SudokuBoard {
     type Error = SudokuError;
 
     fn try_from(input: String) -> Result<Self, Self::Error> {
-        let trimmed_input: Vec<SudokuField> = input
-            .split_whitespace()
-            .collect::<String>()
-            .as_bytes()
-            .iter()
-            .map(SudokuField::try_from)
-            .collect::<Result<Vec<SudokuField>, SudokuError>>()?;
+        let trimmed_input = input.split_whitespace().collect::<String>();
 
-        let board_as_array: [SudokuField; 81] = trimmed_input
-            .try_into()
-            .map_err(|_| SudokuError::InvalidLength)?;
+        if trimmed_input.len() != 81 {
+            return Err(SudokuError::InvalidLength);
+        }
+
+        let mut board_as_array = [[SudokuField::Empty; 9]; 9];
+
+        for (i, field) in trimmed_input.as_bytes().iter().enumerate() {
+            let row = i / 9;
+            let column = i - row * 9;
+
+            board_as_array[row][column] = SudokuField::try_from(field)?;
+        }
 
         Ok(SudokuBoard(board_as_array))
     }
@@ -38,7 +38,7 @@ impl Display for SudokuBoard {
             write!(f, "|")?;
 
             for column in 0..=8 {
-                write!(f, "{}", self.0[row * 9 + column])?;
+                write!(f, "{}", self.0[row][column])?;
 
                 if (column + 1) % 3 == 0 {
                     write!(f, "|")?;
@@ -61,12 +61,12 @@ impl Display for SudokuBoard {
 impl SudokuBoard {
     /// Get the value of a field at row and column
     pub fn get_field(&self, row: usize, column: usize) -> &SudokuField {
-        &self.0[row * 9 + column]
+        &self.0[row][column]
     }
 
     /// Update a field on the board
     pub fn put_field(&mut self, row: usize, column: usize, sudoku_field: SudokuField) {
-        self.0[row * 9 + column] = sudoku_field;
+        self.0[row][column] = sudoku_field;
     }
 
     /// Get the first free field of the board as (row, column)
@@ -191,8 +191,8 @@ mod tests {
 
     #[test]
     fn fails_to_read_a_board_from_string_with_invalid_char() {
-        let file_plus_one = format!("{}A", TEST_SUDOKU);
-        let board = SudokuBoard::try_from(file_plus_one);
+        let invalid_board = format!("Q{}", &TEST_SUDOKU[1..]);
+        let board = SudokuBoard::try_from(invalid_board);
 
         assert!(board.is_err());
 
