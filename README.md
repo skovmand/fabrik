@@ -71,14 +71,8 @@ Results on my MacBook Air M1 2020 (256GB/8GB ram). The "hard sudoku" is a newspa
 
 ```
 solve hard sudoku (1432-3)
-                        time:   [177.54 us 177.59 us 177.64 us]
-Found 14 outliers among 100 measurements (14.00%)
-  5 (5.00%) high mild
-  9 (9.00%) high severe
+                        time:   [153.92 us 153.95 us 153.98 us]
 
 solve very hard sudoku (from ykw1)
-                        time:   [470.87 us 470.97 us 471.10 us]
-Found 8 outliers among 100 measurements (8.00%)
-  4 (4.00%) high mild
-  4 (4.00%) high severe
+                        time:   [396.94 us 397.01 us 397.08 us]
 ```
