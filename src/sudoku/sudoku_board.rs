@@ -83,12 +83,10 @@ impl SudokuBoard {
     }
 
     /// Is a number valid at a given position?
-    pub fn valid_number(&self, row: usize, column: usize, number: u8) -> bool {
-        let number = SudokuField::Value(number);
-
-        !self.number_used_in_row(row, &number)
-            && !self.number_used_in_column(column, &number)
-            && !self.number_used_in_square(row, column, &number)
+    pub fn valid_number(&self, row: usize, column: usize, number: &SudokuField) -> bool {
+        !self.number_used_in_row(row, number)
+            && !self.number_used_in_column(column, number)
+            && !self.number_used_in_square(row, column, number)
     }
 
     /// Is a number unique in a horizontal row?
@@ -269,11 +267,11 @@ mod tests {
     #[test]
     fn valid_number() {
         let board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        assert!(!board.valid_number(2, 2, 9));
-        assert!(!board.valid_number(8, 8, 1));
-        assert!(!board.valid_number(3, 3, 1));
-        assert!(board.valid_number(3, 3, 3));
-        assert!(board.valid_number(0, 0, 2));
-        assert!(board.valid_number(7, 7, 2));
+        assert!(!board.valid_number(2, 2, &SudokuField::Value(9)));
+        assert!(!board.valid_number(8, 8, &SudokuField::Value(1)));
+        assert!(!board.valid_number(3, 3, &SudokuField::Value(1)));
+        assert!(board.valid_number(3, 3, &SudokuField::Value(3)));
+        assert!(board.valid_number(0, 0, &SudokuField::Value(2)));
+        assert!(board.valid_number(7, 7, &SudokuField::Value(2)));
     }
 }

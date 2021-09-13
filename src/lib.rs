@@ -24,8 +24,9 @@ pub fn solve_board<T: SudokuRenderer>(
         // We are still solving!
         Some((row, column)) => {
             for num in 1..=9 {
-                if board.valid_number(row, column, num) {
-                    board.put_field(row, column, SudokuField::Value(num));
+                let field = SudokuField::Value(num);
+                if board.valid_number(row, column, &field) {
+                    board.put_field(row, column, field);
 
                     if let Ok(board) = solve_board(board, renderer) {
                         return Ok(board);
