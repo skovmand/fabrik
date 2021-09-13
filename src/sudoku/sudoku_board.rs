@@ -93,8 +93,10 @@ impl SudokuBoard {
 
     /// Is a number unique in a horizontal row?
     fn number_used_in_row(&self, row: usize, number: &SudokuField) -> bool {
-        for column in 0..9 {
-            if number == self.get_field(row, column) {
+        let row = self.0[row];
+
+        for field in row.iter() {
+            if field == number {
                 return true;
             }
         }
