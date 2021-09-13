@@ -1,3 +1,8 @@
+## 0.6.2 - Small optimizations
+
+* Faster row lookups #8
+* Only create SudokuField::Value once #9
+
 ## 0.6.1 - Delay flag + internal refactors
 
 * Use --delay flag for custom render speed in display mode
