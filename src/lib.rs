@@ -2,7 +2,7 @@ pub mod renderers;
 pub mod sudoku;
 
 use renderers::SudokuRenderer;
-use sudoku::{SudokuBoard, SudokuError, SudokuField};
+use sudoku::{Position, SudokuBoard, SudokuError, SudokuField};
 
 // Backtracking here is at once very advanced and also really simple!
 // For every iteration we are finding the first empty field on the board,
@@ -23,16 +23,18 @@ pub fn solve_board<T: SudokuRenderer>(
 
         // We are still solving!
         Some((row, column)) => {
+            let position = Position { row, column };
+
             for num in 1..=9 {
                 let field = SudokuField::Value(num);
-                if board.valid_number(row, column, &field) {
-                    board.put_field(row, column, field);
+                if board.valid_number(&position, &field) {
+                    board.put_field(&position, field);
 
                     if let Ok(board) = solve_board(board, renderer) {
                         return Ok(board);
                     }
 
-                    board.put_field(row, column, SudokuField::Empty);
+                    board.put_field(&position, SudokuField::Empty);
                 }
             }
 

@@ -1,6 +1,6 @@
 use std::{convert::TryFrom, fmt::Display};
 
-use super::{SudokuError, SudokuField};
+use super::{position::Position, SudokuError, SudokuField};
 
 #[derive(Clone)]
 pub struct SudokuBoard([[SudokuField; 9]; 9]);
@@ -60,20 +60,22 @@ impl Display for SudokuBoard {
 
 impl SudokuBoard {
     /// Get the value of a field at row and column
-    pub fn get_field(&self, row: usize, column: usize) -> &SudokuField {
-        &self.0[row][column]
+    pub fn get_field(&self, position: &Position) -> &SudokuField {
+        &self.0[position.row][position.column]
     }
 
     /// Update a field on the board
-    pub fn put_field(&mut self, row: usize, column: usize, sudoku_field: SudokuField) {
-        self.0[row][column] = sudoku_field;
+    pub fn put_field(&mut self, position: &Position, sudoku_field: SudokuField) {
+        self.0[position.row][position.column] = sudoku_field;
     }
 
     /// Get the first free field of the board as (row, column)
     pub fn first_free_field(&self) -> Option<(usize, usize)> {
         for row in 0..9 {
             for column in 0..9 {
-                if self.get_field(row, column).is_empty() {
+                let position = Position { row, column };
+
+                if self.get_field(&position).is_empty() {
                     return Some((row, column));
                 }
             }
@@ -83,15 +85,15 @@ impl SudokuBoard {
     }
 
     /// Is a number valid at a given position?
-    pub fn valid_number(&self, row: usize, column: usize, number: &SudokuField) -> bool {
-        !self.number_used_in_row(row, number)
-            && !self.number_used_in_column(column, number)
-            && !self.number_used_in_square(row, column, number)
+    pub fn valid_number(&self, position: &Position, number: &SudokuField) -> bool {
+        !self.number_used_in_row(position, number)
+            && !self.number_used_in_column(position, number)
+            && !self.number_used_in_square(position, number)
     }
 
     /// Is a number unique in a horizontal row?
-    fn number_used_in_row(&self, row: usize, number: &SudokuField) -> bool {
-        let row = self.0[row];
+    fn number_used_in_row(&self, position: &Position, number: &SudokuField) -> bool {
+        let row = self.0[position.row];
 
         for field in row.iter() {
             if field == number {
@@ -103,9 +105,14 @@ impl SudokuBoard {
     }
 
     /// Is a number unique in a horizontal row?
-    fn number_used_in_column(&self, column: usize, number: &SudokuField) -> bool {
+    fn number_used_in_column(&self, position: &Position, number: &SudokuField) -> bool {
         for row in 0..9 {
-            if number == self.get_field(row, column) {
+            let position = Position {
+                row,
+                column: position.column,
+            };
+
+            if number == self.get_field(&position) {
                 return true;
             }
         }
@@ -114,12 +121,13 @@ impl SudokuBoard {
     }
 
     /// Is a number used in a 3x3 square?
-    fn number_used_in_square(&self, row: usize, column: usize, number: &SudokuField) -> bool {
-        let (square_row, square_col) = calculate_square(row, column);
+    fn number_used_in_square(&self, position: &Position, number: &SudokuField) -> bool {
+        let (square_row, square_col) = calculate_square(position.row, position.column);
 
-        for current_row in (square_row * 3)..(square_row * 3 + 3) {
-            for current_col in (square_col * 3)..(square_col * 3 + 3) {
-                if self.get_field(current_row, current_col) == number {
+        for row in (square_row * 3)..(square_row * 3 + 3) {
+            for column in (square_col * 3)..(square_col * 3 + 3) {
+                let position = Position { row, column };
+                if self.get_field(&position) == number {
                     return true;
                 }
             }
@@ -204,12 +212,12 @@ mod tests {
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
         assert_eq!(board.first_free_field(), Some((0, 0)));
 
-        board.put_field(0, 0, (&b'8').try_into().unwrap());
+        board.put_field(&(0, 0).into(), (&b'8').try_into().unwrap());
         assert_eq!(board.first_free_field(), Some((0, 3)));
 
         // Fill entire column with garbage
         for column in 0..9 {
-            board.put_field(0, column, (&b'9').try_into().unwrap());
+            board.put_field(&(0, column).into(), (&b'9').try_into().unwrap());
         }
 
         assert_eq!(board.first_free_field(), Some((1, 1)));
@@ -217,7 +225,7 @@ mod tests {
         // Fill entire board with garbage numbers
         for row in 0..9 {
             for column in 0..9 {
-                board.put_field(row, column, (&b'9').try_into().unwrap());
+                board.put_field(&(row, column).into(), (&b'9').try_into().unwrap());
             }
         }
 
@@ -228,30 +236,30 @@ mod tests {
     fn number_used_in_row() {
         let board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
 
-        assert!(board.number_used_in_row(0, &SudokuField::Value(4)));
-        assert!(!board.number_used_in_row(0, &SudokuField::Value(5)));
-        assert!(board.number_used_in_row(6, &SudokuField::Value(5)));
-        assert!(!board.number_used_in_row(6, &SudokuField::Value(3)));
+        assert!(board.number_used_in_row(&(0, 0).into(), &SudokuField::Value(4)));
+        assert!(!board.number_used_in_row(&(0, 0).into(), &SudokuField::Value(5)));
+        assert!(board.number_used_in_row(&(6, 0).into(), &SudokuField::Value(5)));
+        assert!(!board.number_used_in_row(&(6, 0).into(), &SudokuField::Value(3)));
     }
 
     #[test]
     fn number_used_in_column() {
         let board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
 
-        assert!(board.number_used_in_column(2, &SudokuField::Value(7)));
-        assert!(!board.number_used_in_column(2, &SudokuField::Value(3)));
-        assert!(board.number_used_in_column(8, &SudokuField::Value(1)));
-        assert!(!board.number_used_in_column(8, &SudokuField::Value(9)));
+        assert!(board.number_used_in_column(&(0, 2).into(), &SudokuField::Value(7)));
+        assert!(!board.number_used_in_column(&(0, 2).into(), &SudokuField::Value(3)));
+        assert!(board.number_used_in_column(&(0, 8).into(), &SudokuField::Value(1)));
+        assert!(!board.number_used_in_column(&(0, 8).into(), &SudokuField::Value(9)));
     }
 
     #[test]
     fn number_used_in_square() {
         let board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
 
-        assert!(board.number_used_in_square(0, 0, &SudokuField::Value(7)));
-        assert!(!board.number_used_in_square(0, 0, &SudokuField::Value(1)));
-        assert!(board.number_used_in_square(1, 2, &SudokuField::Value(8)));
-        assert!(!board.number_used_in_square(1, 2, &SudokuField::Value(5)));
+        assert!(board.number_used_in_square(&(0, 0).into(), &SudokuField::Value(7)));
+        assert!(!board.number_used_in_square(&(0, 0).into(), &SudokuField::Value(1)));
+        assert!(board.number_used_in_square(&(1, 2).into(), &SudokuField::Value(8)));
+        assert!(!board.number_used_in_square(&(1, 2).into(), &SudokuField::Value(5)));
     }
 
     #[test]
@@ -267,11 +275,11 @@ mod tests {
     #[test]
     fn valid_number() {
         let board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        assert!(!board.valid_number(2, 2, &SudokuField::Value(9)));
-        assert!(!board.valid_number(8, 8, &SudokuField::Value(1)));
-        assert!(!board.valid_number(3, 3, &SudokuField::Value(1)));
-        assert!(board.valid_number(3, 3, &SudokuField::Value(3)));
-        assert!(board.valid_number(0, 0, &SudokuField::Value(2)));
-        assert!(board.valid_number(7, 7, &SudokuField::Value(2)));
+        assert!(!board.valid_number(&(2, 2).into(), &SudokuField::Value(9)));
+        assert!(!board.valid_number(&(8, 8).into(), &SudokuField::Value(1)));
+        assert!(!board.valid_number(&(3, 3).into(), &SudokuField::Value(1)));
+        assert!(board.valid_number(&(3, 3).into(), &SudokuField::Value(3)));
+        assert!(board.valid_number(&(0, 0).into(), &SudokuField::Value(2)));
+        assert!(board.valid_number(&(7, 7).into(), &SudokuField::Value(2)));
     }
 }
