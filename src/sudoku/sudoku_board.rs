@@ -70,13 +70,13 @@ impl SudokuBoard {
     }
 
     /// Get the first free field of the board as (row, column)
-    pub fn first_free_field(&self) -> Option<(usize, usize)> {
+    pub fn first_free_field(&self) -> Option<Position> {
         for row in 0..9 {
             for column in 0..9 {
                 let position = Position { row, column };
 
                 if self.get_field(&position).is_empty() {
-                    return Some((row, column));
+                    return Some(position);
                 }
             }
         }
@@ -210,17 +210,17 @@ mod tests {
     #[test]
     fn first_empty_field() {
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        assert_eq!(board.first_free_field(), Some((0, 0)));
+        assert_eq!(board.first_free_field(), Some((0, 0).into()));
 
         board.put_field(&(0, 0).into(), (&b'8').try_into().unwrap());
-        assert_eq!(board.first_free_field(), Some((0, 3)));
+        assert_eq!(board.first_free_field(), Some((0, 3).into()));
 
         // Fill entire column with garbage
         for column in 0..9 {
             board.put_field(&(0, column).into(), (&b'9').try_into().unwrap());
         }
 
-        assert_eq!(board.first_free_field(), Some((1, 1)));
+        assert_eq!(board.first_free_field(), Some((1, 1).into()));
 
         // Fill entire board with garbage numbers
         for row in 0..9 {
