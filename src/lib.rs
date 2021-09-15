@@ -25,12 +25,15 @@ pub fn solve_board<T: SudokuRenderer>(
             board.put_field(&position, field);
 
             if let Some(position) = board.next_free_field(&position) {
+                // Another free field is present, let's jump to that and continue solving
                 if let Ok(board) = solve_board(board, renderer, position) {
                     return Ok(board);
                 }
 
+                // We met a dead end, set the field to Empty again (after which we will continue looping)
                 board.put_field(&position, SudokuField::Empty);
             } else {
+                // The sudoku has no more empty fields, we are done!
                 return Ok(board.clone());
             };
         }
