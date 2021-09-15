@@ -2,7 +2,7 @@ pub mod renderers;
 pub mod sudoku;
 
 use renderers::SudokuRenderer;
-use sudoku::{SudokuBoard, SudokuError, SudokuField};
+use sudoku::{Position, SudokuBoard, SudokuError, SudokuField};
 
 // Backtracking here is at once very advanced and also really simple!
 // For every iteration we are finding the first empty field on the board,
@@ -13,32 +13,30 @@ use sudoku::{SudokuBoard, SudokuError, SudokuField};
 pub fn solve_board<T: SudokuRenderer>(
     board: &mut SudokuBoard,
     renderer: &T,
+    position: Position,
 ) -> Result<SudokuBoard, SudokuError> {
     // Render the current board
     renderer.display_step(board);
 
-    match board.first_free_field() {
-        // There are no more free fields. The board is solved!
-        None => Ok(board.clone()),
+    for num in 1..=9 {
+        let field = SudokuField::Value(num);
 
-        // We are still solving!
-        Some(position) => {
-            for num in 1..=9 {
-                let field = SudokuField::Value(num);
-                if board.valid_number(&position, &field) {
-                    board.put_field(&position, field);
+        if board.valid_number(&position, &field) {
+            board.put_field(&position, field);
 
-                    if let Ok(board) = solve_board(board, renderer) {
-                        return Ok(board);
-                    }
-
-                    board.put_field(&position, SudokuField::Empty);
+            if let Some(position) = board.first_free_field(&position) {
+                if let Ok(board) = solve_board(board, renderer, position) {
+                    return Ok(board);
                 }
-            }
 
-            Err(SudokuError::Unsolvable)
+                board.put_field(&position, SudokuField::Empty);
+            } else {
+                return Ok(board.clone());
+            };
         }
     }
+
+    Err(SudokuError::Unsolvable)
 }
 
 #[cfg(test)]
@@ -65,7 +63,8 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
+        solve_board(&mut board, &NonRenderer {}, (0, 0).into())
+            .expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -101,7 +100,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(INVALID_SUDOKU.to_owned()).unwrap();
-        let result = solve_board(&mut board, &NonRenderer {});
+        let result = solve_board(&mut board, &NonRenderer {}, (0, 0).into());
 
         assert!(result.is_err());
         assert_eq!(result.err().unwrap(), SudokuError::Unsolvable);
@@ -122,7 +121,8 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(BLANK_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
+        solve_board(&mut board, &NonRenderer {}, (0, 0).into())
+            .expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -158,7 +158,8 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(HARD_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
+        solve_board(&mut board, &NonRenderer {}, (0, 0).into())
+            .expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+

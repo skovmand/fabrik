@@ -69,7 +69,7 @@ fn solve<T: SudokuRenderer>(
 ) -> Result<SudokuBoard, Box<dyn std::error::Error>> {
     let sudoku_file = fs::read_to_string(filename)?;
     let mut board = SudokuBoard::try_from(sudoku_file)?;
-    solve_board(&mut board, renderer)?;
+    solve_board(&mut board, renderer, (0, 0).into())?;
 
     Ok(board)
 }
