@@ -22,17 +22,17 @@ pub fn solve_board<T: SudokuRenderer>(
         None => Ok(board.clone()),
 
         // We are still solving!
-        Some((row, column)) => {
+        Some(position) => {
             for num in 1..=9 {
                 let field = SudokuField::Value(num);
-                if board.valid_number(row, column, &field) {
-                    board.put_field(row, column, field);
+                if board.valid_number(&position, &field) {
+                    board.put_field(&position, field);
 
                     if let Ok(board) = solve_board(board, renderer) {
                         return Ok(board);
                     }
 
-                    board.put_field(row, column, SudokuField::Empty);
+                    board.put_field(&position, SudokuField::Empty);
                 }
             }
 
