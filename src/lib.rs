@@ -24,7 +24,7 @@ pub fn solve_board<T: SudokuRenderer>(
         if board.valid_number(&position, &field) {
             board.put_field(&position, field);
 
-            if let Some(position) = board.first_free_field(&position) {
+            if let Some(position) = board.next_free_field(&position) {
                 if let Ok(board) = solve_board(board, renderer, position) {
                     return Ok(board);
                 }

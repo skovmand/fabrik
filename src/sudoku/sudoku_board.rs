@@ -70,7 +70,7 @@ impl SudokuBoard {
     }
 
     /// Get the first free field of the board as (row, column)
-    pub fn first_free_field(&self, position: &Position) -> Option<Position> {
+    pub fn next_free_field(&self, position: &Position) -> Option<Position> {
         for row in position.row..9 {
             if row == position.row {
                 for column in position.column..9 {
@@ -216,19 +216,19 @@ mod tests {
     }
 
     #[test]
-    fn first_empty_field() {
+    fn next_free_field() {
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        assert_eq!(board.first_free_field(&(0, 0).into()), Some((0, 0).into()));
+        assert_eq!(board.next_free_field(&(0, 0).into()), Some((0, 0).into()));
 
         board.put_field(&(0, 0).into(), (&b'8').try_into().unwrap());
-        assert_eq!(board.first_free_field(&(0, 0).into()), Some((0, 3).into()));
+        assert_eq!(board.next_free_field(&(0, 0).into()), Some((0, 3).into()));
 
         // Fill entire column with garbage
         for column in 0..9 {
             board.put_field(&(0, column).into(), (&b'9').try_into().unwrap());
         }
 
-        assert_eq!(board.first_free_field(&(0, 0).into()), Some((1, 1).into()));
+        assert_eq!(board.next_free_field(&(0, 0).into()), Some((1, 1).into()));
 
         // Fill entire board with garbage numbers
         for row in 0..9 {
@@ -237,7 +237,7 @@ mod tests {
             }
         }
 
-        assert_eq!(board.first_free_field(&(0, 0).into()), None);
+        assert_eq!(board.next_free_field(&(0, 0).into()), None);
     }
 
     #[test]
