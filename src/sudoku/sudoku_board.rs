@@ -1,6 +1,6 @@
 use std::{convert::TryFrom, fmt::Display};
 
-use super::{position::Position, SudokuError, SudokuField};
+use super::{position::Position, BoardIter, ColumnIter, RowIter, SudokuError, SudokuField};
 
 #[derive(Clone)]
 pub struct SudokuBoard([[SudokuField; 9]; 9]);
@@ -16,27 +16,14 @@ impl SudokuBoard {
         self.0[position.row][position.column] = sudoku_field;
     }
 
-    /// Get the first free field of the board as (row, column)
+    /// Get the next empty field of the board given a start position to search from
+    /// Note: The start position will not be included in the search
     pub fn next_empty_field(&self, position: &Position) -> Option<Position> {
-        for row in position.row..9 {
-            if row == position.row {
-                for column in position.column..9 {
-                    let position = Position { row, column };
-                    if self.get_field(&position).is_empty() {
-                        return Some(position);
-                    }
-                }
-            } else {
-                for column in 0..9 {
-                    let position = Position { row, column };
-                    if self.get_field(&position).is_empty() {
-                        return Some(position);
-                    }
-                }
-            }
-        }
+        let next_field = position.increment();
 
-        None
+        BoardIter::new(self, next_field)
+            .find(|(_position, field)| field.is_empty())
+            .map(|(position, _)| position)
     }
 
     /// Is a number valid at a given position?
@@ -48,36 +35,17 @@ impl SudokuBoard {
 
     /// Is a number unique in a horizontal row?
     fn number_used_in_row(&self, position: &Position, number: &SudokuField) -> bool {
-        let row = self.0[position.row];
-
-        for field in row.iter() {
-            if field == number {
-                return true;
-            }
-        }
-
-        false
+        ColumnIter::new(self, position).any(|field| *number == field)
     }
 
-    /// Is a number unique in a horizontal row?
+    /// Is a number unique in a vertical row?
     fn number_used_in_column(&self, position: &Position, number: &SudokuField) -> bool {
-        for row in 0..9 {
-            let position = Position {
-                row,
-                column: position.column,
-            };
-
-            if number == self.get_field(&position) {
-                return true;
-            }
-        }
-
-        false
+        RowIter::new(self, position).any(|field| *number == field)
     }
 
     /// Is a number used in a 3x3 square?
     fn number_used_in_square(&self, position: &Position, number: &SudokuField) -> bool {
-        let (square_row, square_col) = calculate_square(position.row, position.column);
+        let (square_row, square_col) = position.calculate_square();
 
         for row in (square_row * 3)..(square_row * 3 + 3) {
             for column in (square_col * 3)..(square_col * 3 + 3) {
@@ -145,14 +113,6 @@ impl Display for SudokuBoard {
     }
 }
 
-/// Calculate the 3x3 square as (row, number) where both are in range 0-2
-fn calculate_square(row: usize, column: usize) -> (usize, usize) {
-    let square_row = row / 3;
-    let square_column = column / 3;
-
-    (square_row, square_column)
-}
-
 #[cfg(test)]
 mod tests {
     use std::convert::TryInto;
@@ -218,7 +178,7 @@ mod tests {
     #[test]
     fn next_empty_field() {
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        assert_eq!(board.next_empty_field(&(0, 0).into()), Some((0, 0).into()));
+        assert_eq!(board.next_empty_field(&(0, 0).into()), Some((0, 3).into()));
 
         board.put_field(&(0, 0).into(), (&b'8').try_into().unwrap());
         assert_eq!(board.next_empty_field(&(0, 0).into()), Some((0, 3).into()));
@@ -268,16 +228,6 @@ mod tests {
         assert!(!board.number_used_in_square(&(0, 0).into(), &SudokuField::Value(1)));
         assert!(board.number_used_in_square(&(1, 2).into(), &SudokuField::Value(8)));
         assert!(!board.number_used_in_square(&(1, 2).into(), &SudokuField::Value(5)));
-    }
-
-    #[test]
-    fn calculate_square_test() {
-        assert_eq!(calculate_square(0, 0), (0, 0));
-        assert_eq!(calculate_square(2, 2), (0, 0));
-        assert_eq!(calculate_square(4, 2), (1, 0));
-        assert_eq!(calculate_square(8, 2), (2, 0));
-        assert_eq!(calculate_square(8, 3), (2, 1));
-        assert_eq!(calculate_square(8, 6), (2, 2));
     }
 
     #[test]
