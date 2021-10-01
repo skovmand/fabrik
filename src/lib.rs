@@ -31,7 +31,7 @@ fn do_solve_board<T: SudokuRenderer>(
             board.put_field(&position, field);
             renderer.display_step(board);
 
-            if let Some(position) = board.next_free_field(&position) {
+            if let Some(position) = board.next_empty_field(&position) {
                 // Another free field is present, let's jump to that and continue solving
                 if let Ok(board) = do_solve_board(board, renderer, position) {
                     return Ok(board);
