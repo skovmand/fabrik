@@ -15,14 +15,12 @@ pub fn solve_board<T: SudokuRenderer>(
     renderer: &T,
     position: Position,
 ) -> Result<SudokuBoard, SudokuError> {
-    // Render the current board
-    renderer.display_step(board);
-
     for num in 1..=9 {
         let field = SudokuField::Value(num);
 
         if board.valid_number(&position, &field) {
             board.put_field(&position, field);
+            renderer.display_step(board);
 
             if let Some(position) = board.next_free_field(&position) {
                 // Another free field is present, let's jump to that and continue solving
