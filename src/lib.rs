@@ -4,13 +4,22 @@ pub mod sudoku;
 use renderers::SudokuRenderer;
 use sudoku::{Position, SudokuBoard, SudokuError, SudokuField};
 
+/// Solve a SudokuBoard with callback to a SudokuRenderer at every step
+pub fn solve_board<T: SudokuRenderer>(
+    board: &mut SudokuBoard,
+    renderer: &T,
+) -> Result<SudokuBoard, SudokuError> {
+    do_solve_board(board, renderer, Position { row: 0, column: 0 })
+}
+
+// Solve the Sudoku Board
 // Backtracking here is at once very advanced and also really simple!
 // For every iteration we are finding the first empty field on the board,
 // scanning row, column and square to check if a number is valid,
 // then placing the number in the field. After this we will recurse by calling
 // the same function once again, but below the recursion we will put back None
 // into the field, so if the program backtracks, it will restore the original state.
-pub fn solve_board<T: SudokuRenderer>(
+fn do_solve_board<T: SudokuRenderer>(
     board: &mut SudokuBoard,
     renderer: &T,
     position: Position,
@@ -24,7 +33,7 @@ pub fn solve_board<T: SudokuRenderer>(
 
             if let Some(position) = board.next_free_field(&position) {
                 // Another free field is present, let's jump to that and continue solving
-                if let Ok(board) = solve_board(board, renderer, position) {
+                if let Ok(board) = do_solve_board(board, renderer, position) {
                     return Ok(board);
                 }
 
@@ -64,8 +73,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, &NonRenderer {}, (0, 0).into())
-            .expect("Could not solve test board");
+        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -101,7 +109,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(INVALID_SUDOKU.to_owned()).unwrap();
-        let result = solve_board(&mut board, &NonRenderer {}, (0, 0).into());
+        let result = solve_board(&mut board, &NonRenderer {});
 
         assert!(result.is_err());
         assert_eq!(result.err().unwrap(), SudokuError::Unsolvable);
@@ -122,8 +130,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(BLANK_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, &NonRenderer {}, (0, 0).into())
-            .expect("Could not solve test board");
+        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -159,8 +166,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(HARD_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, &NonRenderer {}, (0, 0).into())
-            .expect("Could not solve test board");
+        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
