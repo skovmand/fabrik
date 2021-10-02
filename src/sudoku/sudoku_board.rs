@@ -5,59 +5,6 @@ use super::{position::Position, SudokuError, SudokuField};
 #[derive(Clone)]
 pub struct SudokuBoard([[SudokuField; 9]; 9]);
 
-/// Read a String into a board
-impl TryFrom<String> for SudokuBoard {
-    type Error = SudokuError;
-
-    fn try_from(input: String) -> Result<Self, Self::Error> {
-        let trimmed_input = input.split_whitespace().collect::<String>();
-
-        if trimmed_input.len() != 81 {
-            return Err(SudokuError::InvalidLength);
-        }
-
-        let mut board_as_array = [[SudokuField::Empty; 9]; 9];
-
-        for (i, field) in trimmed_input.as_bytes().iter().enumerate() {
-            let row = i / 9;
-            let column = i - row * 9;
-
-            board_as_array[row][column] = SudokuField::try_from(field)?;
-        }
-
-        Ok(SudokuBoard(board_as_array))
-    }
-}
-
-/// Get a String representation of a board
-impl Display for SudokuBoard {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "+-----------+")?;
-
-        for row in 0..=8 {
-            write!(f, "|")?;
-
-            for column in 0..=8 {
-                write!(f, "{}", self.0[row][column])?;
-
-                if (column + 1) % 3 == 0 {
-                    write!(f, "|")?;
-                }
-            }
-
-            writeln!(f)?;
-
-            if (row + 1) % 3 == 0 && row != 8 {
-                writeln!(f, "+---+---+---+")?;
-            }
-        }
-
-        writeln!(f, "+-----------+")?;
-
-        Ok(())
-    }
-}
-
 impl SudokuBoard {
     /// Get the value of a field at row and column
     pub fn get_field(&self, position: &Position) -> &SudokuField {
@@ -142,6 +89,59 @@ impl SudokuBoard {
         }
 
         false
+    }
+}
+
+/// Read a String into a board
+impl TryFrom<String> for SudokuBoard {
+    type Error = SudokuError;
+
+    fn try_from(input: String) -> Result<Self, Self::Error> {
+        let trimmed_input = input.split_whitespace().collect::<String>();
+
+        if trimmed_input.len() != 81 {
+            return Err(SudokuError::InvalidLength);
+        }
+
+        let mut board_as_array = [[SudokuField::Empty; 9]; 9];
+
+        for (i, field) in trimmed_input.as_bytes().iter().enumerate() {
+            let row = i / 9;
+            let column = i - row * 9;
+
+            board_as_array[row][column] = SudokuField::try_from(field)?;
+        }
+
+        Ok(SudokuBoard(board_as_array))
+    }
+}
+
+/// Get a String representation of a board
+impl Display for SudokuBoard {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "+-----------+")?;
+
+        for row in 0..=8 {
+            write!(f, "|")?;
+
+            for column in 0..=8 {
+                write!(f, "{}", self.0[row][column])?;
+
+                if (column + 1) % 3 == 0 {
+                    write!(f, "|")?;
+                }
+            }
+
+            writeln!(f)?;
+
+            if (row + 1) % 3 == 0 && row != 8 {
+                writeln!(f, "+---+---+---+")?;
+            }
+        }
+
+        writeln!(f, "+-----------+")?;
+
+        Ok(())
     }
 }
 
