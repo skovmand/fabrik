@@ -48,15 +48,8 @@ impl SudokuBoard {
 
     /// Is a number unique in a horizontal row?
     fn number_used_in_row(&self, position: &Position, number: &SudokuField) -> bool {
-        let row = self.0[position.row];
-
-        for field in row.iter() {
-            if field == number {
-                return true;
-            }
-        }
-
-        false
+        let row_slice = &self.0[position.row];
+        row_slice.iter().any(|field| field == number)
     }
 
     /// Is a number unique in a horizontal row?
