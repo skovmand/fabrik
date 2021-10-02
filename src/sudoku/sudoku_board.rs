@@ -46,26 +46,17 @@ impl SudokuBoard {
             && !self.number_used_in_square(position, number)
     }
 
-    /// Is a number unique in a horizontal row?
+    /// Is a number currently used in a row?
     fn number_used_in_row(&self, position: &Position, number: &SudokuField) -> bool {
         let row_slice = &self.0[position.row];
         row_slice.iter().any(|field| field == number)
     }
 
-    /// Is a number unique in a horizontal row?
+    /// Is a number currently used in a column?
     fn number_used_in_column(&self, position: &Position, number: &SudokuField) -> bool {
-        for row in 0..9 {
-            let position = Position {
-                row,
-                column: position.column,
-            };
-
-            if number == self.get_field(&position) {
-                return true;
-            }
-        }
-
-        false
+        (0..9)
+            .map(|row| Position::from((row, position.column)))
+            .any(|position| self.get_field(&position) == number)
     }
 
     /// Is a number used in a 3x3 square?
