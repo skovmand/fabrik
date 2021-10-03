@@ -1,6 +1,6 @@
 use std::{convert::TryFrom, fmt::Display};
 
-use super::{position::Position, SudokuError, SudokuField};
+use super::{iter::BoardIter, position::Position, SudokuError, SudokuField};
 
 #[derive(Clone)]
 pub struct SudokuBoard([[SudokuField; 9]; 9]);
@@ -18,25 +18,9 @@ impl SudokuBoard {
 
     /// Get the first free field of the board as (row, column)
     pub fn next_empty_field(&self, position: &Position) -> Option<Position> {
-        for row in position.row..9 {
-            if row == position.row {
-                for column in position.column..9 {
-                    let position = Position { row, column };
-                    if self.get_field(&position).is_empty() {
-                        return Some(position);
-                    }
-                }
-            } else {
-                for column in 0..9 {
-                    let position = Position { row, column };
-                    if self.get_field(&position).is_empty() {
-                        return Some(position);
-                    }
-                }
-            }
-        }
-
-        None
+        BoardIter::new(self, *position)
+            .find(|(_position, field)| field.is_empty())
+            .map(|(position, _field)| position)
     }
 
     /// Is a number valid at a given position?
