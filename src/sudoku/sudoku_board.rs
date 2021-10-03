@@ -61,18 +61,14 @@ impl SudokuBoard {
 
     /// Is a number used in a 3x3 square?
     fn number_used_in_square(&self, position: &Position, number: &SudokuField) -> bool {
-        let (square_row, square_col) = calculate_square(position.row, position.column);
+        let square_row = position.row / 3;
+        let square_column = position.column / 3;
 
-        for row in (square_row * 3)..(square_row * 3 + 3) {
-            for column in (square_col * 3)..(square_col * 3 + 3) {
-                let position = Position { row, column };
-                if self.get_field(&position) == number {
-                    return true;
-                }
-            }
-        }
-
-        false
+        (0..3)
+            .map(|row_increase| {
+                &self.0[square_row * 3 + row_increase][(square_column * 3)..(square_column * 3 + 3)]
+            })
+            .any(|slice| slice.contains(number))
     }
 }
 
@@ -127,14 +123,6 @@ impl Display for SudokuBoard {
 
         Ok(())
     }
-}
-
-/// Calculate the 3x3 square as (row, number) where both are in range 0-2
-fn calculate_square(row: usize, column: usize) -> (usize, usize) {
-    let square_row = row / 3;
-    let square_column = column / 3;
-
-    (square_row, square_column)
 }
 
 #[cfg(test)]
@@ -252,16 +240,6 @@ mod tests {
         assert!(!board.number_used_in_square(&(0, 0).into(), &SudokuField::Value(1)));
         assert!(board.number_used_in_square(&(1, 2).into(), &SudokuField::Value(8)));
         assert!(!board.number_used_in_square(&(1, 2).into(), &SudokuField::Value(5)));
-    }
-
-    #[test]
-    fn calculate_square_test() {
-        assert_eq!(calculate_square(0, 0), (0, 0));
-        assert_eq!(calculate_square(2, 2), (0, 0));
-        assert_eq!(calculate_square(4, 2), (1, 0));
-        assert_eq!(calculate_square(8, 2), (2, 0));
-        assert_eq!(calculate_square(8, 3), (2, 1));
-        assert_eq!(calculate_square(8, 6), (2, 2));
     }
 
     #[test]
