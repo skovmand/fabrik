@@ -16,7 +16,7 @@ impl SudokuBoard {
         self.0[position.row][position.column] = sudoku_field;
     }
 
-    /// Get the first free field of the board as (row, column)
+    /// Get the next free field of the board
     pub fn next_empty_field(&self, position: &Position) -> Option<Position> {
         BoardIter::new(self, *position)
             .find(|(_position, field)| field.is_empty())
