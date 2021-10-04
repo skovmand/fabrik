@@ -15,8 +15,8 @@ impl<'a> BoardIter<'a> {
         }
     }
 
-    pub fn set_position(&mut self, position: Position) -> &'a mut BoardIter {
-        self.position = position;
+    pub fn set_position(&mut self, position: &Position) -> &'a mut BoardIter {
+        self.position = *position;
         self
     }
 }
