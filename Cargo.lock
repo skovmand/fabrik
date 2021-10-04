@@ -210,7 +210,7 @@ checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
 name = "fabrik"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "clap 3.0.0-beta.4",
  "criterion",

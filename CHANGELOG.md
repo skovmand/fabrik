@@ -1,3 +1,10 @@
+## 0.6.3 - Refactoring and slight speedup
+
+* Implement IntoIterator for SudokuBoard, #15 #16
+* Functional implementations of row, column, square searches
+* Remember current position instead of iterating the whole board for empty fields #11
+* Use Position for board positions #10
+
 ## 0.6.2 - Small optimizations
 
 * Faster row lookups #8
