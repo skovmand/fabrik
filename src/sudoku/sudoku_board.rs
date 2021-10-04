@@ -5,6 +5,15 @@ use super::{iter::BoardIter, position::Position, SudokuError, SudokuField};
 #[derive(Clone)]
 pub struct SudokuBoard([[SudokuField; 9]; 9]);
 
+impl<'a> IntoIterator for &'a SudokuBoard {
+    type Item = (Position, SudokuField);
+    type IntoIter = BoardIter<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        BoardIter::new(self)
+    }
+}
+
 impl SudokuBoard {
     /// Get the value of a field at row and column
     pub fn get_field(&self, position: &Position) -> &SudokuField {
@@ -18,7 +27,8 @@ impl SudokuBoard {
 
     /// Get the next free field of the board
     pub fn next_empty_field(&self, position: &Position) -> Option<Position> {
-        BoardIter::new(self, *position)
+        self.into_iter()
+            .set_position(*position)
             .find(|(_position, field)| field.is_empty())
             .map(|(position, _field)| position)
     }
