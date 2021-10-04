@@ -7,9 +7,17 @@ pub struct BoardIter<'a> {
     position: Position,
 }
 
-impl BoardIter<'_> {
-    pub fn new(board: &SudokuBoard, position: Position) -> BoardIter {
-        BoardIter { board, position }
+impl<'a> BoardIter<'a> {
+    pub fn new(board: &SudokuBoard) -> BoardIter {
+        BoardIter {
+            board,
+            position: Position { row: 0, column: 0 },
+        }
+    }
+
+    pub fn set_position(&mut self, position: Position) -> &'a mut BoardIter {
+        self.position = position;
+        self
     }
 }
 
