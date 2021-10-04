@@ -1,3 +1,4 @@
+mod iter;
 mod position;
 mod sudoku_board;
 mod sudoku_error;
