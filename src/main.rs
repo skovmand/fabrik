@@ -3,7 +3,7 @@ mod terminal_renderers;
 use crate::terminal_renderers::{DelayedRenderer, Renderer, TerminalRenderer};
 use clap::{crate_version, App, AppSettings, Arg};
 use fabrik::{renderers::SudokuRenderer, solve_board, sudoku::SudokuBoard};
-use std::{convert::TryFrom, fs, time::Duration};
+use std::{fs, time::Duration};
 
 fn main() {
     let matches = App::new("fabrik")

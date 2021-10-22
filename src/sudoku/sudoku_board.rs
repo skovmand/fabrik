@@ -121,8 +121,6 @@ impl Display for SudokuBoard {
 
 #[cfg(test)]
 mod tests {
-    use std::convert::TryInto;
-
     use super::*;
     use indoc::indoc;
 

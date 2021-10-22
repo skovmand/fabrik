@@ -1,5 +1,3 @@
-use std::convert::TryFrom;
-
 use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
 use fabrik::{renderers::NonRenderer, solve_board, sudoku::SudokuBoard};
 

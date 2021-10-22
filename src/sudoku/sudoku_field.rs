@@ -1,7 +1,4 @@
-use std::{
-    convert::TryFrom,
-    fmt::{Display, Write},
-};
+use std::fmt::{Display, Write};
 
 use super::SudokuError;
 

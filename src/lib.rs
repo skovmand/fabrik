@@ -51,8 +51,6 @@ fn do_solve_board<T: SudokuRenderer>(
 
 #[cfg(test)]
 mod tests {
-    use std::convert::TryFrom;
-
     use crate::renderers::NonRenderer;
 
     use super::*;

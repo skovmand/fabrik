@@ -39,8 +39,6 @@ impl Iterator for BoardIter<'_> {
 
 #[cfg(test)]
 mod test {
-    use std::convert::TryFrom;
-
     use super::*;
 
     const TEST_SUDOKU: &str = "
