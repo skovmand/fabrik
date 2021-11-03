@@ -16,11 +16,8 @@ impl From<usize> for Position {
 
 impl From<(usize, usize)> for Position {
     /// Convert a 2d usize of (row, col) into a position
-    fn from(coords: (usize, usize)) -> Self {
-        Position {
-            row: coords.0,
-            column: coords.1,
-        }
+    fn from((row, column): (usize, usize)) -> Self {
+        Position { row, column }
     }
 }
 
