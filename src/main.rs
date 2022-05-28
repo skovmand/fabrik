@@ -1,3 +1,5 @@
+#![forbid(unsafe_code)]
+
 mod terminal_renderers;
 
 use crate::terminal_renderers::{DelayedRenderer, Renderer, TerminalRenderer};

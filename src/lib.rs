@@ -1,3 +1,5 @@
+#![forbid(unsafe_code)]
+
 pub mod renderers;
 pub mod sudoku;
 
