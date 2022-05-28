@@ -1,31 +1,31 @@
 mod terminal_renderers;
 
 use crate::terminal_renderers::{DelayedRenderer, Renderer, TerminalRenderer};
-use clap::{crate_version, App, AppSettings, Arg};
+use clap::{crate_version, Arg, Command};
 use fabrik::{renderers::SudokuRenderer, solve_board, sudoku::SudokuBoard};
 use std::{fs, time::Duration};
 
 fn main() {
-    let matches = App::new("fabrik")
+    let matches = Command::new("fabrik")
         .version(crate_version!())
         .author("https://github.com/skovmand/fabrik")
-        .about("Brute force sudoku solver using backtracking")
+        .about("Brute force sudoku solver")
+        .arg_required_else_help(true)
         .arg(
             Arg::new("display")
                 .long("display")
                 .short('d')
-                .about("Solve the sudoku in display mode"),
+                .help("Solve the sudoku in display mode"),
         )
         .arg(
             Arg::new("delay")
                 .long("delay")
                 .takes_value(true)
-                .about("Set the delay in ms used in display mode (defaults to 50ms)"),
+                .help("Set the delay in ms used in display mode (defaults to 50ms)"),
         )
-        .setting(AppSettings::ArgRequiredElseHelp)
         .arg(
             Arg::new("INPUT")
-                .about("Sets the input file to use")
+                .help("Sets the input file to use")
                 .required(true)
                 .index(1),
         )
