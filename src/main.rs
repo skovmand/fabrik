@@ -1,10 +1,11 @@
 #![forbid(unsafe_code)]
 
-mod terminal_renderers;
-
-use crate::terminal_renderers::{DelayedRenderer, Renderer, TerminalRenderer};
 use clap::{crate_version, Arg, Command};
-use fabrik::{renderers::SudokuRenderer, solve_board, sudoku::SudokuBoard};
+use fabrik::{
+    renderers::{DelayedRenderer, Renderer, SudokuRenderer, TerminalRenderer},
+    solve_board,
+    sudoku::SudokuBoard,
+};
 use std::{fs, time::Duration};
 
 fn main() {

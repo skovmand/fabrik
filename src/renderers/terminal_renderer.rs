@@ -1,4 +1,4 @@
-use fabrik::{renderers::SudokuRenderer, sudoku::SudokuBoard};
+use crate::{renderers::SudokuRenderer, sudoku::SudokuBoard};
 
 pub struct TerminalRenderer {}
 

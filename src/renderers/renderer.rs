@@ -3,7 +3,8 @@
 //// SudokuRenderer so it can be passed into a function with those trait bounds, and it just
 //// delegates to the internal renderers.
 
-use fabrik::{renderers::SudokuRenderer, sudoku::SudokuBoard};
+use crate::renderers::SudokuRenderer;
+use crate::sudoku::SudokuBoard;
 
 use super::{DelayedRenderer, TerminalRenderer};
 

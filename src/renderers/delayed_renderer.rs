@@ -1,7 +1,8 @@
-use fabrik::{renderers::SudokuRenderer, sudoku::SudokuBoard};
-use std::{thread, time::Duration};
+use crate::renderers::ansi::*;
+use crate::renderers::SudokuRenderer;
+use crate::sudoku::SudokuBoard;
 
-use crate::terminal_renderers::ansi::*;
+use std::{thread, time::Duration};
 
 pub struct DelayedRenderer {
     pub delay: Duration,
