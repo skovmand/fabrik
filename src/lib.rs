@@ -7,9 +7,9 @@ use renderers::SudokuRenderer;
 use sudoku::{Position, SudokuBoard, SudokuError, SudokuField};
 
 /// Solve a SudokuBoard with callback to a SudokuRenderer at every step
-pub fn solve_board<T: SudokuRenderer>(
+pub fn solve_board(
     board: &mut SudokuBoard,
-    renderer: &T,
+    renderer: &impl SudokuRenderer,
 ) -> Result<SudokuBoard, SudokuError> {
     do_solve_board(board, renderer, Position { row: 0, column: 0 })
 }
@@ -21,9 +21,9 @@ pub fn solve_board<T: SudokuRenderer>(
 // then placing the number in the field. After this we will recurse by calling
 // the same function once again, but below the recursion we will put back None
 // into the field, so if the program backtracks, it will restore the original state.
-fn do_solve_board<T: SudokuRenderer>(
+fn do_solve_board(
     board: &mut SudokuBoard,
-    renderer: &T,
+    renderer: &impl SudokuRenderer,
     position: Position,
 ) -> Result<SudokuBoard, SudokuError> {
     for num in 1..=9 {
