@@ -9,6 +9,8 @@ jobs:
       image: rust:1
     steps:
       - uses: actions/checkout@v2
+      - name: Version
+        run: cargo --version --verbose
       - name: Test
         run: cargo test
 
@@ -18,6 +20,8 @@ jobs:
       image: rust:1
     steps:
       - uses: actions/checkout@v2
+      - name: Version
+        run: cargo --version --verbose
       - name: Linting
         run: |
           rustup component add clippy
@@ -29,6 +33,8 @@ jobs:
       image: rust:1
     steps:
       - uses: actions/checkout@v2
+      - name: Version
+        run: cargo --version --verbose
       - name: Verify code formatting
         run: |
           rustup component add rustfmt
