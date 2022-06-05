@@ -2,7 +2,7 @@
 
 use clap::{crate_version, Arg, Command};
 use fabrik::{
-    renderers::{DelayedRenderer, Renderer, SudokuRenderer, TerminalRenderer},
+    renderers::{DelayedRenderer, Renderer, ResultOnlyRenderer, SudokuRenderer},
     solve_board,
     sudoku::SudokuBoard,
 };
@@ -45,7 +45,7 @@ fn main() {
 
         Renderer::Delayed(DelayedRenderer { delay })
     } else {
-        Renderer::FinalResultOnly(TerminalRenderer {})
+        Renderer::FinalResultOnly(ResultOnlyRenderer {})
     };
 
     // Set up renderer

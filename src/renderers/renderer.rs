@@ -6,11 +6,11 @@
 use crate::renderers::SudokuRenderer;
 use crate::sudoku::SudokuBoard;
 
-use super::{DelayedRenderer, TerminalRenderer};
+use super::{DelayedRenderer, ResultOnlyRenderer};
 
 pub enum Renderer {
     Delayed(DelayedRenderer),
-    FinalResultOnly(TerminalRenderer),
+    FinalResultOnly(ResultOnlyRenderer),
 }
 
 impl SudokuRenderer for Renderer {

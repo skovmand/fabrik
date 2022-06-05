@@ -1,8 +1,8 @@
 use crate::{renderers::SudokuRenderer, sudoku::SudokuBoard};
 
-pub struct TerminalRenderer {}
+pub struct ResultOnlyRenderer {}
 
-impl SudokuRenderer for TerminalRenderer {
+impl SudokuRenderer for ResultOnlyRenderer {
     fn setup(&self, filename: &str) {
         println!("{}", filename);
     }

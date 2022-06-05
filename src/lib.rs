@@ -53,7 +53,7 @@ fn do_solve_board(
 
 #[cfg(test)]
 mod tests {
-    use crate::renderers::NonRenderer;
+    use crate::renderers::NoopRenderer;
 
     use super::*;
     use indoc::indoc;
@@ -73,7 +73,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(TEST_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
+        solve_board(&mut board, &NoopRenderer {}).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -109,7 +109,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(INVALID_SUDOKU.to_owned()).unwrap();
-        let result = solve_board(&mut board, &NonRenderer {});
+        let result = solve_board(&mut board, &NoopRenderer {});
 
         assert!(result.is_err());
         assert_eq!(result.err().unwrap(), SudokuError::Unsolvable);
@@ -130,7 +130,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(BLANK_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
+        solve_board(&mut board, &NoopRenderer {}).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
@@ -166,7 +166,7 @@ mod tests {
         "};
 
         let mut board = SudokuBoard::try_from(HARD_SUDOKU.to_owned()).unwrap();
-        solve_board(&mut board, &NonRenderer {}).expect("Could not solve test board");
+        solve_board(&mut board, &NoopRenderer {}).expect("Could not solve test board");
 
         let expected_solution = indoc! {"
             +-----------+
