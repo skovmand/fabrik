@@ -1,0 +1,41 @@
+name: Fabrik CI
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: rust:1
+    steps:
+      - uses: actions/checkout@v2
+      - name: Version
+        run: cargo --version --verbose
+      - name: Test
+        run: cargo test
+
+  lint:
+    runs-on: ubuntu-latest
+    container:
+      image: rust:1
+    steps:
+      - uses: actions/checkout@v2
+      - name: Version
+        run: cargo --version --verbose
+      - name: Linting
+        run: |
+          rustup component add clippy
+          cargo clippy -- -D warnings
+
+  format:
+    runs-on: ubuntu-latest
+    container:
+      image: rust:1
+    steps:
+      - uses: actions/checkout@v2
+      - name: Version
+        run: cargo --version --verbose
+      - name: Verify code formatting
+        run: |
+          rustup component add rustfmt
+          cargo fmt -- --check
