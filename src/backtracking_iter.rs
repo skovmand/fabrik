@@ -38,10 +38,8 @@ impl BacktrackingIter {
 
     // Prepare instructions in the stack for execution
     fn prepare_stack(&mut self, next_empty_field: Position) {
-        // Insert a BackTo(position) with the current position if there are instructions in the stack
-        if !self.stack.is_empty() {
-            self.stack.push(Instruction::BackTo(self.current_position));
-        }
+        // Insert a BackTo(position) with the current position
+        self.stack.push(Instruction::BackTo(self.current_position));
 
         // Try the value 1 first. This will be incremented up until 9 during execution.
         // We could have pushed 9 separate instructions instead, but this performs better.
