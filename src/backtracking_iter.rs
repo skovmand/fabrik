@@ -22,7 +22,7 @@ enum WhatHappened {
 
 #[derive(Copy, Clone, Debug)]
 enum Instruction {
-    TryValue(Position, u8),
+    WorkOnField(Position, u8),
     BackTo(Position),
 }
 
@@ -43,7 +43,8 @@ impl BacktrackingIter {
 
         // Try the value 1 first. This will be incremented up until 9 during execution.
         // We could have pushed 9 separate instructions instead, but this performs better.
-        self.stack.push(Instruction::TryValue(next_empty_field, 1));
+        self.stack
+            .push(Instruction::WorkOnField(next_empty_field, 1));
     }
 
     // Manipulate the board from the stack instructions
@@ -51,21 +52,22 @@ impl BacktrackingIter {
         loop {
             match self.stack.pop() {
                 Some(instruction) => match instruction {
-                    Instruction::TryValue(pos, v) => {
+                    Instruction::WorkOnField(pos, v) => {
                         self.current_position = pos;
 
-                        // Insert TryValue(v + 1) on the top of the stack, to be able to resume work on this field
-                        // if we backtrack to this position again. But only if (v + 1 <= 9).
-                        if v < 9 {
-                            self.stack.push(Instruction::TryValue(pos, v + 1));
-                        }
+                        for value in v..=9 {
+                            let field = Field::from_u8(value);
 
-                        let field = Field::from_u8(v);
+                            if self.board.valid_number_at_position(pos, &field) {
+                                // Insert WorkOnField(current_position, v + 1) on the top of the stack,
+                                // to be able to resume work on this field if we backtrack to this position again.
+                                if value < 9 {
+                                    self.stack.push(Instruction::WorkOnField(pos, value + 1));
+                                }
 
-                        if self.board.valid_number_at_position(pos, &field) {
-                            self.board.put_field(pos, field);
-
-                            return WhatHappened::PutNewFieldOnBoard;
+                                self.board.put_field(pos, field);
+                                return WhatHappened::PutNewFieldOnBoard;
+                            }
                         }
 
                         // Nothing is returned, which means what we will loop once more
