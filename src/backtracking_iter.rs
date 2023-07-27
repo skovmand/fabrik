@@ -12,7 +12,7 @@ use super::{field::Field, position::Position};
 pub struct BacktrackingIter {
     board: Board,
     current_position: Position,
-    stack: Vec<Instruction>,
+    stack: Vec<WorkOnField>,
 }
 
 enum WhatHappened {
@@ -21,9 +21,7 @@ enum WhatHappened {
 }
 
 #[derive(Copy, Clone, Debug)]
-enum Instruction {
-    WorkOnField(Position, u8),
-}
+struct WorkOnField(Position, u8);
 
 impl BacktrackingIter {
     /// Create a backtracking iterator for a Board
@@ -39,8 +37,7 @@ impl BacktrackingIter {
     fn prepare_stack(&mut self, next_empty_field: Position) {
         // Try the value 1 first. This will be incremented up until 9 during execution.
         // We could have pushed 9 separate instructions instead, but this performs better.
-        self.stack
-            .push(Instruction::WorkOnField(next_empty_field, 1));
+        self.stack.push(WorkOnField(next_empty_field, 1));
     }
 
     // Manipulate the board from the stack instructions
@@ -48,7 +45,7 @@ impl BacktrackingIter {
         loop {
             match self.stack.pop() {
                 Some(instruction) => match instruction {
-                    Instruction::WorkOnField(pos, v) => {
+                    WorkOnField(pos, v) => {
                         self.current_position = pos;
 
                         for value in v..=10 {
@@ -56,7 +53,7 @@ impl BacktrackingIter {
                                 if self.board.valid_number_at_position(pos, &field) {
                                     // Insert WorkOnField(current_position, v + 1) on the top of the stack,
                                     // to be able to resume work on this field if we backtrack to this position again.
-                                    self.stack.push(Instruction::WorkOnField(pos, value + 1));
+                                    self.stack.push(WorkOnField(pos, value + 1));
 
                                     self.board.put_field(pos, field);
                                     return WhatHappened::PutNewFieldOnBoard;
