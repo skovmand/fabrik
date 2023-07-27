@@ -23,7 +23,7 @@ enum WhatHappened {
 #[derive(Copy, Clone, Debug)]
 enum Instruction {
     WorkOnField(Position, u8),
-    BackTo(Position),
+    ClearField(Position),
 }
 
 impl BacktrackingIter {
@@ -38,9 +38,6 @@ impl BacktrackingIter {
 
     // Prepare instructions in the stack for execution
     fn prepare_stack(&mut self, next_empty_field: Position) {
-        // Insert a BackTo(position) with the current position
-        self.stack.push(Instruction::BackTo(self.current_position));
-
         // Try the value 1 first. This will be incremented up until 9 during execution.
         // We could have pushed 9 separate instructions instead, but this performs better.
         self.stack
@@ -63,6 +60,8 @@ impl BacktrackingIter {
                                 // to be able to resume work on this field if we backtrack to this position again.
                                 if value < 9 {
                                     self.stack.push(Instruction::WorkOnField(pos, value + 1));
+                                } else {
+                                    self.stack.push(Instruction::ClearField(pos))
                                 }
 
                                 self.board.put_field(pos, field);
@@ -70,14 +69,10 @@ impl BacktrackingIter {
                             }
                         }
 
-                        // Nothing is returned, which means what we will loop once more
+                        self.board.put_field(pos, Field::empty());
                     }
-                    Instruction::BackTo(pos) => {
-                        // Clear out the current position before moving back
-                        self.board.put_field(self.current_position, Field::empty());
-
-                        // Move back
-                        self.current_position = pos;
+                    Instruction::ClearField(pos) => {
+                        self.board.put_field(pos, Field::empty());
                     }
                 },
                 None => {
