@@ -49,7 +49,9 @@ impl BacktrackingIter {
                         self.current_position = pos;
 
                         for value in v..=10 {
-                            if let Ok(field) = Field::new(value) {
+                            if value <= 9 {
+                                let field = Field::from_u8(value);
+
                                 if self.board.valid_number_at_position(pos, &field) {
                                     // Insert WorkOnField(current_position, v + 1) on the top of the stack,
                                     // to be able to resume work on this field if we backtrack to this position again.
@@ -58,7 +60,11 @@ impl BacktrackingIter {
                                     self.board.put_field(pos, field);
                                     return WhatHappened::PutNewFieldOnBoard;
                                 }
+
+                                // If nothing is returned, we will simply run the for-loop again.
                             } else {
+                                // We have tried all number 1..9 for this field. Clear it and loop in the outer loop,
+                                // effectively backtracking to the previous position.
                                 self.board.put_field(pos, Field::empty());
                             }
                         }
