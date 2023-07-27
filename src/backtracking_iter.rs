@@ -100,13 +100,11 @@ impl Iterator for BacktrackingIter {
 
         match self.execute_stack() {
             WhatHappened::PutNewFieldOnBoard => {
-                // After the new field is put on the board,
-                // Check to see if more fields are available
-                // If not, then we consider the board solved
-                let are_more_fields_available =
-                    self.board.next_empty_field(self.current_position).is_none();
+                // After the new field is put on the board, check to see if more fields are available.
+                // If not, then we consider the board solved.
+                let board_is_solved = self.board.next_empty_field(self.current_position).is_none();
 
-                Some((self.board, are_more_fields_available))
+                Some((self.board, board_is_solved))
             }
             WhatHappened::RanOutOfStack => None,
         }
