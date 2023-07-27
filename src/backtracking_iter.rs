@@ -23,7 +23,6 @@ enum WhatHappened {
 #[derive(Copy, Clone, Debug)]
 enum Instruction {
     WorkOnField(Position, u8),
-    ClearField(Position),
 }
 
 impl BacktrackingIter {
@@ -52,27 +51,20 @@ impl BacktrackingIter {
                     Instruction::WorkOnField(pos, v) => {
                         self.current_position = pos;
 
-                        for value in v..=9 {
-                            let field = Field::from_u8(value);
-
-                            if self.board.valid_number_at_position(pos, &field) {
-                                // Insert WorkOnField(current_position, v + 1) on the top of the stack,
-                                // to be able to resume work on this field if we backtrack to this position again.
-                                if value < 9 {
+                        for value in v..=10 {
+                            if let Ok(field) = Field::new(value) {
+                                if self.board.valid_number_at_position(pos, &field) {
+                                    // Insert WorkOnField(current_position, v + 1) on the top of the stack,
+                                    // to be able to resume work on this field if we backtrack to this position again.
                                     self.stack.push(Instruction::WorkOnField(pos, value + 1));
-                                } else {
-                                    self.stack.push(Instruction::ClearField(pos))
-                                }
 
-                                self.board.put_field(pos, field);
-                                return WhatHappened::PutNewFieldOnBoard;
+                                    self.board.put_field(pos, field);
+                                    return WhatHappened::PutNewFieldOnBoard;
+                                }
+                            } else {
+                                self.board.put_field(pos, Field::empty());
                             }
                         }
-
-                        self.board.put_field(pos, Field::empty());
-                    }
-                    Instruction::ClearField(pos) => {
-                        self.board.put_field(pos, Field::empty());
                     }
                 },
                 None => {
