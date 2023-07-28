@@ -12,7 +12,7 @@ use super::{field::Field, position::Position};
 pub struct BacktrackingIter {
     board: Board,
     current_position: Position,
-    stack: Vec<Instruction>,
+    stack: Vec<WorkOnField>,
 }
 
 enum WhatHappened {
@@ -21,10 +21,7 @@ enum WhatHappened {
 }
 
 #[derive(Copy, Clone, Debug)]
-enum Instruction {
-    WorkOnField(Position, u8),
-    BackTo(Position),
-}
+struct WorkOnField(Position, u8);
 
 impl BacktrackingIter {
     /// Create a backtracking iterator for a Board
@@ -38,13 +35,9 @@ impl BacktrackingIter {
 
     // Prepare instructions in the stack for execution
     fn prepare_stack(&mut self, next_empty_field: Position) {
-        // Insert a BackTo(position) with the current position
-        self.stack.push(Instruction::BackTo(self.current_position));
-
         // Try the value 1 first. This will be incremented up until 9 during execution.
         // We could have pushed 9 separate instructions instead, but this performs better.
-        self.stack
-            .push(Instruction::WorkOnField(next_empty_field, 1));
+        self.stack.push(WorkOnField(next_empty_field, 1));
     }
 
     // Manipulate the board from the stack instructions
@@ -52,32 +45,29 @@ impl BacktrackingIter {
         loop {
             match self.stack.pop() {
                 Some(instruction) => match instruction {
-                    Instruction::WorkOnField(pos, v) => {
+                    WorkOnField(pos, v) => {
                         self.current_position = pos;
 
-                        for value in v..=9 {
-                            let field = Field::from_u8(value);
+                        for value in v..=10 {
+                            if value <= 9 {
+                                let field = Field::from_u8(value);
 
-                            if self.board.valid_number_at_position(pos, &field) {
-                                // Insert WorkOnField(current_position, v + 1) on the top of the stack,
-                                // to be able to resume work on this field if we backtrack to this position again.
-                                if value < 9 {
-                                    self.stack.push(Instruction::WorkOnField(pos, value + 1));
+                                if self.board.valid_number_at_position(pos, &field) {
+                                    // Insert WorkOnField(current_position, v + 1) on the top of the stack,
+                                    // to be able to resume work on this field if we backtrack to this position again.
+                                    self.stack.push(WorkOnField(pos, value + 1));
+
+                                    self.board.put_field(pos, field);
+                                    return WhatHappened::PutNewFieldOnBoard;
                                 }
 
-                                self.board.put_field(pos, field);
-                                return WhatHappened::PutNewFieldOnBoard;
+                                // If nothing is returned, we will simply run the for-loop again.
+                            } else {
+                                // We have tried all number 1..9 for this field. Clear it and loop in the outer loop,
+                                // effectively backtracking to the previous position.
+                                self.board.put_field(pos, Field::empty());
                             }
                         }
-
-                        // Nothing is returned, which means what we will loop once more
-                    }
-                    Instruction::BackTo(pos) => {
-                        // Clear out the current position before moving back
-                        self.board.put_field(self.current_position, Field::empty());
-
-                        // Move back
-                        self.current_position = pos;
                     }
                 },
                 None => {
