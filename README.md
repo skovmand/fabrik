@@ -1,5 +1,9 @@
 # fabrik
 
+This repository has moved to Codeberg. Please visit https://codeberg.org/skovmand/fabrik for updates in the future.
+
+---
+
 ![Build Status](https://github.com/skovmand/fabrik/workflows/Fabrik%20CI/badge.svg)
 
 An iterator based sudoku solving library using backtracking. Written in Rust ❤️
